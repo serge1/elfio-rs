@@ -110,8 +110,8 @@ mod elfio {
             }
         }
 
-        fn create_and_load_header(&mut self, buffer: &mut File, class: &u8) -> io::Result<()> {
-            if *class == ELFCLASS64 {
+        fn create_and_load_header(&mut self, buffer: &mut File, class: u8) -> io::Result<()> {
+            if class == ELFCLASS64 {
                 let header = Self::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer)?;
                 self.header = Some(Box::new(ElfHeader::ElfHeader64(header)));
             } else {
@@ -122,12 +122,12 @@ mod elfio {
             Ok(())
         }
 
-        pub fn load(&mut self, buffer: &mut File) -> io::Result<()> {
+        pub fn load(&mut self, mut buffer: File) -> io::Result<()> {
             let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
             // Read ELF file signature
             buffer.read_exact(&mut e_ident)?;
             buffer.seek(io::SeekFrom::Start(0))?;
-            
+
             // Is it ELF file?
             if e_ident[EI_MAG0] != ELFMAG0
                 || e_ident[EI_MAG1] != ELFMAG1
@@ -154,7 +154,7 @@ mod elfio {
                 ));
             }
 
-            return self.create_and_load_header(buffer, &e_ident[EI_CLASS]);
+            return self.create_and_load_header(&mut buffer, e_ident[EI_CLASS]);
         }
     }
 }
@@ -166,11 +166,11 @@ fn main() -> io::Result<()> {
 
     // Eventually, change File to BufReader
     //    let mut file = File::open("/home/user/ELFIO/tests/elf_examples/hello_32")?;
-    let mut file = File::open("/home/user/elfio-rs/target/debug/elfio-rs")?;
+    let file = File::open("/home/user/elfio-rs/target/debug/elfio-rs")?;
 
     let mut elfio = elfio::Elfio::new();
 
-    elfio.load(&mut file)?;
+    elfio.load(file)?;
 
     Ok(())
 }
