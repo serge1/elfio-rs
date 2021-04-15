@@ -2,7 +2,6 @@ mod elfio {
     use std::fs::File;
     use std::io;
     use std::io::prelude::*;
-    use std::mem;
     use std::slice;
 
     pub type ElfHalf = u16;
@@ -65,13 +64,30 @@ mod elfio {
         e_shstrndx: ElfHalf,
     }
 
+    trait ElfHeaderTrait {
+        fn load(&self) -> Result<(), &'static str>;
+    }
+
     enum ElfHeader {
         ElfHeader32(ElfEhdr<Elf32Addr, Elf32Off>),
         ElfHeader64(ElfEhdr<Elf64Addr, Elf64Off>),
     }
 
+    impl ElfHeaderTrait for ElfHeader {
+        fn load(&self) -> Result<(), &'static str> {
+            println!("'load' has been called");
+
+            match &self {
+                ElfHeader::ElfHeader64(_) => println!("64-bit header load"),
+                ElfHeader::ElfHeader32(_) => println!("32-bit header load"),
+            }
+
+            return Ok(());
+        }
+    }
+
     pub struct Elfio {
-        header: Option<ElfHeader>,
+        header: Option<Box<dyn ElfHeaderTrait>>,
     }
 
     impl Elfio {
@@ -79,74 +95,66 @@ mod elfio {
             return Elfio { header: None };
         }
 
-        fn read_struct<T, R: Read>(read: &mut R) -> io::Result<T> {
+        fn read_struct<T, R: Read>(buffer: &mut R) -> io::Result<T> {
             let num_bytes = ::std::mem::size_of::<T>();
             unsafe {
-                let mut s = ::std::mem::uninitialized();
-                let buffer = slice::from_raw_parts_mut(&mut s as *mut T as *mut u8, num_bytes);
-                match read.read_exact(buffer) {
-                    Ok(()) => Ok(s),
+                let mut mem = ::std::mem::MaybeUninit::uninit().assume_init();
+                let ptr = slice::from_raw_parts_mut(&mut mem as *mut T as *mut u8, num_bytes);
+                match buffer.read_exact(ptr) {
+                    Ok(()) => Ok(mem),
                     Err(e) => {
-                        ::std::mem::forget(s);
+                        ::std::mem::forget(mem);
                         Err(e)
                     }
                 }
             }
         }
 
-        pub fn load(&mut self, buffer: &mut File) -> Result<(), &'static str> {
+        fn create_and_load_header(&mut self, buffer: &mut File, class: &u8) -> io::Result<()> {
+            if *class == ELFCLASS64 {
+                let header = Self::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer)?;
+                self.header = Some(Box::new(ElfHeader::ElfHeader64(header)));
+            } else {
+                let header = Self::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer)?;
+                self.header = Some(Box::new(ElfHeader::ElfHeader32(header)));
+            }
+
+            Ok(())
+        }
+
+        pub fn load(&mut self, buffer: &mut File) -> io::Result<()> {
             let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
             // Read ELF file signature
-            buffer
-                .read_exact(&mut e_ident)
-                .expect("Can't read from file");
-
-            match buffer.seek(io::SeekFrom::Start(0)) {
-                Ok(s) => s,
-                Err(_) => return Err("File operation failed"),
-            };
-
+            buffer.read_exact(&mut e_ident)?;
+            buffer.seek(io::SeekFrom::Start(0))?;
+            
             // Is it ELF file?
             if e_ident[EI_MAG0] != ELFMAG0
                 || e_ident[EI_MAG1] != ELFMAG1
                 || e_ident[EI_MAG2] != ELFMAG2
                 || e_ident[EI_MAG3] != ELFMAG3
             {
-                return Err("File signature doesn't conform ELF file");
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "File signature doesn't conform ELF file",
+                ));
             }
 
             if e_ident[EI_CLASS] != ELFCLASS64 && e_ident[EI_CLASS] != ELFCLASS32 {
-                return Err("Unknown ELF class value");
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "Unknown ELF class value",
+                ));
             }
 
             if e_ident[EI_DATA] != ELFDATA2LSB && e_ident[EI_DATA] != ELFDATA2MSB {
-                return Err("Unknown ELF file endianess");
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "Unknown ELF file endianess",
+                ));
             }
 
-            // let mut header: ElfEhdr<Elf64Addr, Elf64Off> =
-            //     Self::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer).unwrap();
-
-            if e_ident[EI_CLASS] == ELFCLASS64 {
-                let header = match Self::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer) {
-                    Ok(h) => h,
-                    Err(_) => return Err("File operation failed"),
-                };
-                self.header = Some(ElfHeader::ElfHeader64(header));
-            } else {
-                let header = match Self::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer) {
-                    Ok(h) => h,
-                    Err(_) => return Err("File operation failed"),
-                };
-                self.header = Some(ElfHeader::ElfHeader32(header));
-            }
-
-            match &self.header {
-                Some(ElfHeader::ElfHeader64(x)) => println!("64-bit header: {:#?}", x),
-                Some(ElfHeader::ElfHeader32(x)) => println!("32-bit header: {:#?}", x),
-                None => println!("There is no header"),
-            }
-
-            return Ok(());
+            return self.create_and_load_header(buffer, &e_ident[EI_CLASS]);
         }
     }
 }
@@ -156,15 +164,13 @@ use std::io;
 fn main() -> io::Result<()> {
     use std::fs::File;
 
-    // Eventually, change it to BufReader
-    let mut file = File::open("/home/user/ELFIO/tests/elf_examples/hello_32")?;
+    // Eventually, change File to BufReader
+    //    let mut file = File::open("/home/user/ELFIO/tests/elf_examples/hello_32")?;
+    let mut file = File::open("/home/user/elfio-rs/target/debug/elfio-rs")?;
 
     let mut elfio = elfio::Elfio::new();
 
-    match elfio.load(&mut file) {
-        Ok(_) => println!("It is OK"),
-        Err(str) => println!("Error: {}", str),
-    }
+    elfio.load(&mut file)?;
 
     Ok(())
 }
