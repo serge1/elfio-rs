@@ -4,16 +4,8 @@ mod elfio {
     use std::io::prelude::*;
     use std::slice;
 
-    pub type ElfHalf = u16;
-    pub type ElfWord = u32;
-    pub type ElfSword = i32;
-    pub type ElfXword = u64;
-    pub type ElfSxword = i64;
-
-    pub type Elf32Addr = u32;
-    pub type Elf32Off = u32;
-    pub type Elf64Addr = u64;
-    pub type Elf64Off = u64;
+    pub mod types;
+    pub use types::*;
 
     // Identification index
     pub const EI_MAG0: usize = 0;
@@ -49,7 +41,7 @@ mod elfio {
     #[derive(Debug)]
     struct ElfEhdr<Addr, Offset> {
         e_ident: [u8; EI_NIDENT],
-        e_type: ElfHalf,
+        e_type: types::ElfHalf,
         e_machine: ElfHalf,
         e_version: ElfWord,
         e_entry: Addr,
@@ -154,7 +146,7 @@ mod elfio {
                 ));
             }
 
-            return self.create_and_load_header(&mut buffer, e_ident[EI_CLASS]);
+            self.create_and_load_header(&mut buffer, e_ident[EI_CLASS])
         }
     }
 }
