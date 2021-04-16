@@ -3,6 +3,7 @@ use std::io;
 mod elfio;
 mod header;
 mod types;
+mod utils;
 
 pub use types::*;
 

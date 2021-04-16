@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io;
 
 use crate::types::*;
+use super::utils::*;
 
 // Identification index
 pub const EI_MAG0: usize = 0;
@@ -59,13 +60,13 @@ pub enum ElfHeader {
 
 pub fn load(buffer: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeaderTrait>>> {
     if class == ELFCLASS64 {
-        let header = super::elfio::Elfio::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer);
+        let header = super::utils::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer);
         match header {
             Ok(h) => return Ok(Some(Box::new(ElfHeader::ElfHeader64(h)))),
             Err(e) => return Err(e),
         }
     } else {
-        let header = super::elfio::Elfio::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer);
+        let header = super::utils::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer);
         match header {
             Ok(h) => return Ok(Some(Box::new(ElfHeader::ElfHeader32(h)))),
             Err(e) => return Err(e),
