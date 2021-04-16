@@ -1,11 +1,11 @@
+mod types;
+pub use types::*;
+
 mod elfio {
     use std::fs::File;
     use std::io;
     use std::io::prelude::*;
     use std::slice;
-
-    pub mod types;
-    pub use types::*;
 
     // Identification index
     pub const EI_MAG0: usize = 0;
@@ -41,19 +41,19 @@ mod elfio {
     #[derive(Debug)]
     struct ElfEhdr<Addr, Offset> {
         e_ident: [u8; EI_NIDENT],
-        e_type: types::ElfHalf,
-        e_machine: ElfHalf,
-        e_version: ElfWord,
+        e_type: crate::types::ElfHalf,
+        e_machine: crate::types::ElfHalf,
+        e_version: crate::types::ElfWord,
         e_entry: Addr,
         e_phoff: Offset,
         e_shoff: Offset,
-        e_flags: ElfWord,
-        e_ehsize: ElfHalf,
-        e_phentsize: ElfHalf,
-        e_phnum: ElfHalf,
-        e_shentsize: ElfHalf,
-        e_shnum: ElfHalf,
-        e_shstrndx: ElfHalf,
+        e_flags: crate::types::ElfWord,
+        e_ehsize: crate::types::ElfHalf,
+        e_phentsize: crate::types::ElfHalf,
+        e_phnum: crate::types::ElfHalf,
+        e_shentsize: crate::types::ElfHalf,
+        e_shnum: crate::types::ElfHalf,
+        e_shstrndx: crate::types::ElfHalf,
     }
 
     trait ElfHeaderTrait {
@@ -61,8 +61,8 @@ mod elfio {
     }
 
     enum ElfHeader {
-        ElfHeader32(ElfEhdr<Elf32Addr, Elf32Off>),
-        ElfHeader64(ElfEhdr<Elf64Addr, Elf64Off>),
+        ElfHeader32(ElfEhdr<crate::types::Elf32Addr, crate::types::Elf32Off>),
+        ElfHeader64(ElfEhdr<crate::types::Elf64Addr, crate::types::Elf64Off>),
     }
 
     impl ElfHeaderTrait for ElfHeader {
@@ -104,10 +104,10 @@ mod elfio {
 
         fn create_and_load_header(&mut self, buffer: &mut File, class: u8) -> io::Result<()> {
             if class == ELFCLASS64 {
-                let header = Self::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer)?;
+                let header = Self::read_struct::<ElfEhdr<crate::types::Elf64Addr, crate::types::Elf64Off>, File>(buffer)?;
                 self.header = Some(Box::new(ElfHeader::ElfHeader64(header)));
             } else {
-                let header = Self::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer)?;
+                let header = Self::read_struct::<ElfEhdr<crate::types::Elf32Addr, crate::types::Elf32Off>, File>(buffer)?;
                 self.header = Some(Box::new(ElfHeader::ElfHeader32(header)));
             }
 
