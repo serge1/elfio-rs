@@ -1,9 +1,8 @@
 use std::io;
 
 mod elfio;
-mod types;
 mod header;
-
+mod types;
 
 fn main() -> io::Result<()> {
     use std::fs::File;

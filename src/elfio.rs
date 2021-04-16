@@ -3,9 +3,8 @@ use std::io;
 use std::io::prelude::*;
 use std::slice;
 
-use crate::types::*;
 use crate::header::*;
-
+use crate::types::*;
 
 pub struct Elfio {
     header: Option<Box<dyn ElfHeaderTrait>>,
@@ -33,16 +32,10 @@ impl Elfio {
 
     fn create_and_load_header(&mut self, buffer: &mut File, class: u8) -> io::Result<()> {
         if class == ELFCLASS64 {
-            let header = Self::read_struct::<
-                ElfEhdr<Elf64Addr, Elf64Off>,
-                File,
-            >(buffer)?;
+            let header = Self::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer)?;
             self.header = Some(Box::new(ElfHeader::ElfHeader64(header)));
         } else {
-            let header = Self::read_struct::<
-                ElfEhdr<Elf32Addr, Elf32Off>,
-                File,
-            >(buffer)?;
+            let header = Self::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer)?;
             self.header = Some(Box::new(ElfHeader::ElfHeader32(header)));
         }
 

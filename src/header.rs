@@ -1,6 +1,5 @@
 use crate::types::*;
 
-
 // Identification index
 pub const EI_MAG0: usize = 0;
 pub const EI_MAG1: usize = 1;
