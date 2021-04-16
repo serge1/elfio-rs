@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
+use super::header;
 use super::header::*;
 pub use super::types::*;
 
@@ -11,7 +12,7 @@ pub struct Elfio {
 
 impl Elfio {
     pub fn new() -> Elfio {
-        return Elfio { header: None };
+        Elfio { header: None }
     }
 
     pub fn load(&mut self, mut buffer: File) -> io::Result<()> {
@@ -46,14 +47,15 @@ impl Elfio {
             ));
         }
 
-        match super::header::load(&mut buffer, e_ident[EI_CLASS]) {
+        match header::load(&mut buffer, e_ident[EI_CLASS]) {
             Ok(h) => self.header = h,
             Err(e) => return Err(e),
         }
 
-        self.header.as_ref().unwrap().whoami();
         self.header.as_ref().unwrap().get_class();
+        self.header.as_ref().unwrap().get_sections_num();
+        self.header.as_ref().unwrap().get_section_name_str_index();
 
-        return Ok(());
+        Ok(())
     }
 }

@@ -1,3 +1,4 @@
+use paste::paste;
 use std::fs::File;
 use std::io;
 
@@ -14,7 +15,7 @@ pub const EI_DATA: usize = 5;
 pub const EI_VERSION: usize = 6;
 pub const EI_OSABI: usize = 7;
 pub const EI_ABIVERSION: usize = 8;
-pub const EI_PAD: usize = 9;
+//pub const EI_PAD: usize = 9;
 pub const EI_NIDENT: usize = 16;
 
 // Magic number
@@ -53,6 +54,33 @@ pub struct ElfEhdr<Addr, Offset> {
     e_shstrndx: ElfHalf,
 }
 
+macro_rules! GET_SET_ACCESS_DECL {
+    ($type: ident, $name: ident) => {
+        paste! {
+            fn [<get_ $name>](&self) -> $type;
+        }
+    };
+}
+
+macro_rules! GET_SET_ACCESS {
+    ($type: ident, $field: ident, $name: ident) => {
+        paste! {
+            fn [<get_ $name>](&self) -> $type {
+                match self {
+                    ElfHeader::ElfHeader32(s) => {
+                        println!("{} {}", stringify!($name), paste! [s. $field]);
+                        paste! [s. $field]
+                    }
+                    ElfHeader::ElfHeader64(s) => {
+                        println!("{} {}", stringify!($name), paste! [s. $field]);
+                        paste! [s. $field]
+                    }
+                }
+            }
+        }
+    };
+}
+
 pub enum ElfHeader {
     ElfHeader32(ElfEhdr<Elf32Addr, Elf32Off>),
     ElfHeader64(ElfEhdr<Elf64Addr, Elf64Off>),
@@ -62,40 +90,37 @@ pub fn load(buffer: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeader
     if class == ELFCLASS64 {
         let header = utils::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer);
         match header {
-            Ok(h) => return Ok(Some(Box::new(ElfHeader::ElfHeader64(h)))),
-            Err(e) => return Err(e),
+            Ok(h) => Ok(Some(Box::new(ElfHeader::ElfHeader64(h)))),
+            Err(e) => Err(e),
         }
     } else {
         let header = utils::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer);
         match header {
-            Ok(h) => return Ok(Some(Box::new(ElfHeader::ElfHeader32(h)))),
-            Err(e) => return Err(e),
+            Ok(h) => Ok(Some(Box::new(ElfHeader::ElfHeader32(h)))),
+            Err(e) => Err(e),
         }
     }
 }
 
 pub trait ElfHeaderTrait {
-    fn whoami(&self);
     fn get_class(&self) -> ElfHalf;
+    GET_SET_ACCESS_DECL!(ElfHalf, sections_num);
+    GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
 }
 
 impl ElfHeaderTrait for ElfHeader {
-    fn whoami(&self) {
-        match self {
-            ElfHeader::ElfHeader32(_) => println!("32-bit ELF header"),
-            ElfHeader::ElfHeader64(_) => println!("64-bit ELF header"),
-        }
-    }
+    GET_SET_ACCESS!(ElfHalf, e_shnum, sections_num);
+    GET_SET_ACCESS!(ElfHalf, e_shstrndx, section_name_str_index);
 
     fn get_class(&self) -> ElfHalf {
         match self {
             ElfHeader::ElfHeader32(s) => {
                 println!("e_shstrndx {}", s.e_shstrndx);
-                return s.e_shstrndx;
+                s.e_shstrndx
             }
             ElfHeader::ElfHeader64(s) => {
                 println!("e_shstrndx {}", s.e_shstrndx);
-                return s.e_shstrndx;
+                s.e_shstrndx
             }
         }
     }
