@@ -3,8 +3,8 @@ use std::io;
 use std::io::prelude::*;
 use std::slice;
 
-use crate::header::*;
-use crate::types::*;
+use super::header::*;
+//use super::types::*;
 
 pub struct Elfio {
     header: Option<Box<dyn ElfHeaderTrait>>,
@@ -15,7 +15,7 @@ impl Elfio {
         return Elfio { header: None };
     }
 
-    fn read_struct<T, R: Read>(buffer: &mut R) -> io::Result<T> {
+    pub fn read_struct<T, R: Read>(buffer: &mut R) -> io::Result<T> {
         let num_bytes = ::std::mem::size_of::<T>();
         unsafe {
             let mut mem = ::std::mem::MaybeUninit::uninit().assume_init();
@@ -28,18 +28,6 @@ impl Elfio {
                 }
             }
         }
-    }
-
-    fn create_and_load_header(&mut self, buffer: &mut File, class: u8) -> io::Result<()> {
-        if class == ELFCLASS64 {
-            let header = Self::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer)?;
-            self.header = Some(Box::new(ElfHeader::ElfHeader64(header)));
-        } else {
-            let header = Self::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer)?;
-            self.header = Some(Box::new(ElfHeader::ElfHeader32(header)));
-        }
-
-        Ok(())
     }
 
     pub fn load(&mut self, mut buffer: File) -> io::Result<()> {
@@ -74,6 +62,14 @@ impl Elfio {
             ));
         }
 
-        self.create_and_load_header(&mut buffer, e_ident[EI_CLASS])
+        match super::header::load(&mut buffer, e_ident[EI_CLASS]) {
+            Ok(h) => self.header = h,
+            Err(e) => return Err(e),
+        }
+
+        self.header.as_ref().unwrap().whoami();
+        self.header.as_ref().unwrap().get_class();
+
+        return Ok(());
     }
 }

@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io;
+
 use crate::types::*;
 
 // Identification index
@@ -54,19 +57,45 @@ pub enum ElfHeader {
     ElfHeader64(ElfEhdr<Elf64Addr, Elf64Off>),
 }
 
+pub fn load(buffer: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeaderTrait>>> {
+    if class == ELFCLASS64 {
+        let header = super::elfio::Elfio::read_struct::<ElfEhdr<Elf64Addr, Elf64Off>, File>(buffer);
+        match header {
+            Ok(h) => return Ok(Some(Box::new(ElfHeader::ElfHeader64(h)))),
+            Err(e) => return Err(e),
+        }
+    } else {
+        let header = super::elfio::Elfio::read_struct::<ElfEhdr<Elf32Addr, Elf32Off>, File>(buffer);
+        match header {
+            Ok(h) => return Ok(Some(Box::new(ElfHeader::ElfHeader32(h)))),
+            Err(e) => return Err(e),
+        }
+    }
+}
+
 pub trait ElfHeaderTrait {
-    fn load(&self) -> Result<(), &'static str>;
+    fn whoami(&self);
+    fn get_class(&self) -> ElfHalf;
 }
 
 impl ElfHeaderTrait for ElfHeader {
-    fn load(&self) -> Result<(), &'static str> {
-        println!("'load' has been called");
-
-        match &self {
-            ElfHeader::ElfHeader64(_) => println!("64-bit header load"),
-            ElfHeader::ElfHeader32(_) => println!("32-bit header load"),
+    fn whoami(&self) {
+        match self {
+            ElfHeader::ElfHeader32(_) => println!("32-bit ELF header"),
+            ElfHeader::ElfHeader64(_) => println!("64-bit ELF header"),
         }
+    }
 
-        return Ok(());
+    fn get_class(&self) -> ElfHalf {
+        match self {
+            ElfHeader::ElfHeader32(s) => {
+                println!("e_shstrndx {}", s.e_shstrndx);
+                return s.e_shstrndx;
+            }
+            ElfHeader::ElfHeader64(s) => {
+                println!("e_shstrndx {}", s.e_shstrndx);
+                return s.e_shstrndx;
+            }
+        }
     }
 }
