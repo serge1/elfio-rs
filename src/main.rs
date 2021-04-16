@@ -1,11 +1,9 @@
-mod types;
-pub use types::*;
+use std::io;
 
 mod elfio;
-pub use crate::elfio::*;
+mod types;
+mod header;
 
-
-use std::io;
 
 fn main() -> io::Result<()> {
     use std::fs::File;
