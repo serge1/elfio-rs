@@ -63,7 +63,7 @@ macro_rules! GET_SET_ACCESS_DECL {
 }
 
 macro_rules! GET_SET_ACCESS {
-    ($type: ident, $field: ident, $name: ident) => {
+    ($type: ident, $name: ident, $field: ident) => {
         paste! {
             fn [<get_ $name>](&self) -> $type {
                 match self {
@@ -103,24 +103,24 @@ pub fn load(buffer: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeader
 }
 
 pub trait ElfHeaderTrait {
-    fn get_class(&self) -> ElfHalf;
+    GET_SET_ACCESS_DECL!(u8, class);
     GET_SET_ACCESS_DECL!(ElfHalf, sections_num);
     GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
 }
 
 impl ElfHeaderTrait for ElfHeader {
-    GET_SET_ACCESS!(ElfHalf, e_shnum, sections_num);
-    GET_SET_ACCESS!(ElfHalf, e_shstrndx, section_name_str_index);
+    GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
+    GET_SET_ACCESS!(ElfHalf, section_name_str_index, e_shstrndx);
 
-    fn get_class(&self) -> ElfHalf {
+    fn get_class(&self) -> u8 {
         match self {
             ElfHeader::ElfHeader32(s) => {
-                println!("e_shstrndx {}", s.e_shstrndx);
-                s.e_shstrndx
+                println!("e_ident[EI_CLASS] {}", s.e_ident[EI_CLASS]);
+                s.e_ident[EI_CLASS]
             }
             ElfHeader::ElfHeader64(s) => {
-                println!("e_shstrndx {}", s.e_shstrndx);
-                s.e_shstrndx
+                println!("e_ident[EI_CLASS] {}", s.e_ident[EI_CLASS]);
+                s.e_ident[EI_CLASS]
             }
         }
     }
