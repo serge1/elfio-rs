@@ -2,7 +2,6 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
-use super::header;
 use super::header::*;
 pub use super::types::*;
 
@@ -47,7 +46,13 @@ impl Elfio {
             ));
         }
 
-        match header::load(&mut buffer, e_ident[EI_CLASS]) {
+        if e_ident[EI_CLASS] == ELFCLASS64 {
+            self.header = Some(Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()));
+        } else {
+            self.header = Some(Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new()));
+        }
+
+        match self.header.as_ref().unwrap().load(&mut buffer, e_ident[EI_CLASS]) {
             Ok(h) => self.header = h,
             Err(e) => return Err(e),
         }
