@@ -1,7 +1,6 @@
 extern crate num;
 
 use num::{NumCast, Zero};
-
 use paste::paste;
 use std::fs::File;
 use std::io;
@@ -16,10 +15,10 @@ pub const EI_MAG2: usize = 2;
 pub const EI_MAG3: usize = 3;
 pub const EI_CLASS: usize = 4;
 pub const EI_DATA: usize = 5;
-pub const EI_VERSION: usize = 6;
-pub const EI_OSABI: usize = 7;
-pub const EI_ABIVERSION: usize = 8;
-//pub const EI_PAD: usize = 9;
+// pub const EI_VERSION: usize = 6;
+// pub const EI_OSABI: usize = 7;
+// pub const EI_ABIVERSION: usize = 8;
+// pub const EI_PAD: usize = 9;
 pub const EI_NIDENT: usize = 16;
 
 // Magic number
@@ -70,20 +69,14 @@ macro_rules! GET_SET_ACCESS {
     ($type: ident, $name: ident, $field: ident) => {
         paste! {
             fn [<get_ $name>](&self) -> $type {
-                println!("{} {}", stringify!($name), paste! [self. $field]);
                 paste! [self. $field]
             }
         }
     };
 }
 
-// pub enum ElfHeader {
-//     ElfHeader32(ElfEhdr<Elf32Addr, Elf32Off>),
-//     ElfHeader64(ElfEhdr<Elf64Addr, Elf64Off>),
-// }
-
 pub trait ElfHeaderTrait {
-    fn load(self, buffer: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeaderTrait>>>;
+    fn load(&mut self, buffer: &mut File) -> io::Result<()>;
 
     GET_SET_ACCESS_DECL!(u8, class);
     GET_SET_ACCESS_DECL!(ElfHalf, sections_num);
@@ -115,52 +108,18 @@ where
     }
 }
 
-/*
-impl ElfHeaderTrait for ElfHeader<Elf32Addr, Elf32Off> {
-    fn load(self, buffer: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeaderTrait>>> {
-        let header = utils::read_struct::<ElfHeader<Elf32Addr, Elf32Off>, File>(buffer);
-        match header {
-            Ok(h) => Ok(Some(Box::new(self))),
-            Err(e) => Err(e),
-        }
-    }
-
-    GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
-    GET_SET_ACCESS!(ElfHalf, section_name_str_index, e_shstrndx);
-
-    fn get_class(&self) -> u8 {
-        println!("e_ident[EI_CLASS] {}", self.e_ident[EI_CLASS]);
-        self.e_ident[EI_CLASS]
-    }
-}
-
-impl ElfHeaderTrait for ElfHeader<Elf64Addr, Elf64Off> {
-    fn load(self, buffer: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeaderTrait>>> {
-        let header = utils::read_struct::<ElfHeader<Elf32Addr, Elf32Off>, File>(buffer);
-        match header {
-            Ok(h) => Ok(Some(Box::new(self))),
-            Err(e) => Err(e),
-        }
-    }
-    GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
-    GET_SET_ACCESS!(ElfHalf, section_name_str_index, e_shstrndx);
-
-    fn get_class(&self) -> u8 {
-        println!("e_ident[EI_CLASS] {}", self.e_ident[EI_CLASS]);
-        self.e_ident[EI_CLASS]
-    }
-}
-*/
-
 impl<Addr, Offset> ElfHeaderTrait for ElfHeader<Addr, Offset>
 where
     Addr: NumCast + Copy,
     Offset: NumCast + Copy,
 {
-    fn load(self, reader: &mut File, class: u8) -> io::Result<Option<Box<dyn ElfHeaderTrait>>> {
+    fn load(&mut self, reader: &mut File) -> io::Result<()> {
         let header = utils::read_struct::<ElfHeader<Addr, Offset>, File>(reader);
         match header {
-            Ok(h) => Ok(Some(Box::new(header))),
+            Ok(h) => {
+                unsafe { std::ptr::copy_nonoverlapping(&h, self, 8);}
+                Ok(())
+            }
             Err(e) => Err(e),
         }
     }
@@ -169,7 +128,6 @@ where
     GET_SET_ACCESS!(ElfHalf, section_name_str_index, e_shstrndx);
 
     fn get_class(&self) -> u8 {
-        println!("e_ident[EI_CLASS] {}", self.e_ident[EI_CLASS]);
         self.e_ident[EI_CLASS]
     }
 }

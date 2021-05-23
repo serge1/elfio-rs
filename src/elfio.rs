@@ -52,14 +52,14 @@ impl Elfio {
             self.header = Some(Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new()));
         }
 
-        match self.header.as_ref().unwrap().load(&mut buffer, e_ident[EI_CLASS]) {
-            Ok(h) => self.header = h,
+        match self.header.as_mut().unwrap().load(&mut buffer) {
+            Ok(_) => (),
             Err(e) => return Err(e),
         }
 
-        self.header.as_ref().unwrap().get_class();
-        self.header.as_ref().unwrap().get_sections_num();
-        self.header.as_ref().unwrap().get_section_name_str_index();
+        let v1 = self.header.as_ref().unwrap().get_class();
+        let v2 = self.header.as_ref().unwrap().get_sections_num();
+        let v3 = self.header.as_ref().unwrap().get_section_name_str_index();
 
         Ok(())
     }
