@@ -61,6 +61,8 @@ impl Elfio {
         let v2 = self.header.as_ref().unwrap().get_sections_num();
         let v3 = self.header.as_ref().unwrap().get_section_name_str_index();
 
+        println!("{} {} {}", v1, v2, v3);
+
         Ok(())
     }
 }

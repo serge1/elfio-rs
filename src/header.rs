@@ -4,9 +4,10 @@ use num::{NumCast, Zero};
 use paste::paste;
 use std::fs::File;
 use std::io;
+use std::io::prelude::*;
+use std::slice;
 
 use super::types::*;
-use super::utils;
 
 // Identification index
 pub const EI_MAG0: usize = 0;
@@ -114,14 +115,13 @@ where
     Offset: NumCast + Copy,
 {
     fn load(&mut self, reader: &mut File) -> io::Result<()> {
-        let header = utils::read_struct::<ElfHeader<Addr, Offset>, File>(reader);
-        match header {
-            Ok(h) => {
-                unsafe { std::ptr::copy_nonoverlapping(&h, self, 8);}
-                Ok(())
-            }
-            Err(e) => Err(e),
+        let num_bytes = ::std::mem::size_of::<Self>();
+        println!("{}", num_bytes);
+        unsafe {
+            let ptr = slice::from_raw_parts_mut(self as *mut Self as *mut u8, num_bytes);
+            reader.read_exact(ptr)?;
         }
+        Ok(())
     }
 
     GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
