@@ -1,6 +1,7 @@
 extern crate num;
 
 use num::{NumCast, Zero};
+use num::cast::AsPrimitive;
 use paste::paste;
 use std::fs::File;
 use std::io;
@@ -70,7 +71,7 @@ macro_rules! GET_SET_ACCESS {
     ($type: ident, $name: ident, $field: ident) => {
         paste! {
             fn [<get_ $name>](&self) -> $type {
-                paste! [self. $field]
+                paste! [self. $field].as_()
             }
         }
     };
@@ -80,14 +81,25 @@ pub trait ElfHeaderTrait {
     fn load(&mut self, buffer: &mut File) -> io::Result<()>;
 
     GET_SET_ACCESS_DECL!(u8, class);
+
+    GET_SET_ACCESS_DECL!(ElfWord, version);
+    // GET_SET_ACCESS_DECL!(u8, os_abi);
+    // GET_SET_ACCESS_DECL!(u8, abi_version);
+    GET_SET_ACCESS_DECL!(ElfHalf, type);
+    GET_SET_ACCESS_DECL!(ElfHalf, machine);
+    GET_SET_ACCESS_DECL!(ElfWord, flags);
+    GET_SET_ACCESS_DECL!(Elf64Addr, entry);
     GET_SET_ACCESS_DECL!(ElfHalf, sections_num);
+    GET_SET_ACCESS_DECL!(Elf64Off, sections_offset);
+    GET_SET_ACCESS_DECL!(ElfHalf, segments_num);
+    GET_SET_ACCESS_DECL!(Elf64Off, segments_offset);
     GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
 }
 
 impl<Addr, Offset> ElfHeader<Addr, Offset>
 where
-    Addr: Zero + NumCast,
-    Offset: Zero + NumCast,
+    Addr: Zero + NumCast + AsPrimitive<u64>,
+    Offset: Zero + NumCast + AsPrimitive<u64>,
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
         ElfHeader::<Addr, Offset> {
@@ -111,8 +123,8 @@ where
 
 impl<Addr, Offset> ElfHeaderTrait for ElfHeader<Addr, Offset>
 where
-    Addr: NumCast + Copy,
-    Offset: NumCast + Copy,
+    Addr: NumCast + Copy + AsPrimitive<u64>,
+    Offset: NumCast + Copy + AsPrimitive<u64>,
 {
     fn load(&mut self, reader: &mut File) -> io::Result<()> {
         let num_bytes = ::std::mem::size_of::<Self>();
@@ -124,8 +136,18 @@ where
         Ok(())
     }
 
-    GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
+    GET_SET_ACCESS!(ElfWord, version, e_version);
+    // GET_SET_ACCESS!(u8, os_abi, e_ident[EI_OSABI]);
+    // GET_SET_ACCESS!(u8, abi_version, e_ident[EI_ABIVERSION]);
+    GET_SET_ACCESS!(ElfHalf, type, e_type);
+    GET_SET_ACCESS!(ElfHalf, machine, e_machine);
+    GET_SET_ACCESS!(ElfWord, flags, e_flags);
     GET_SET_ACCESS!(ElfHalf, section_name_str_index, e_shstrndx);
+    GET_SET_ACCESS!(Elf64Addr, entry, e_entry);
+    GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
+    GET_SET_ACCESS!(Elf64Off, sections_offset, e_shoff);
+    GET_SET_ACCESS!(ElfHalf, segments_num, e_phnum);
+    GET_SET_ACCESS!(Elf64Off, segments_offset, e_phoff);
 
     fn get_class(&self) -> u8 {
         self.e_ident[EI_CLASS]
