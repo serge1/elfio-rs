@@ -24,7 +24,7 @@ extern crate num;
 
 use super::types::*;
 use num::cast::AsPrimitive;
-use num::{Num, NumCast, Zero};
+use num::{Num, Zero};
 use paste::paste;
 use std::fs::File;
 use std::io;
@@ -43,7 +43,7 @@ macro_rules! ELFIO_GET_SET_ACCESS_DECL {
     ($type: ident, $name: ident) => {
         paste! {
             fn [<get_ $name>](&self) -> $type;
-            // fn [<set_ $name>](&mut self, value: $type) -> ();
+            fn [<set_ $name>](&mut self, value: $type) -> ();
         }
     };
 }
@@ -64,9 +64,9 @@ macro_rules! ELFIO_GET_SET_ACCESS {
             fn [<get_ $name>](&self) -> $type {
                 paste! [self. $field].as_()
             }
-            // fn [<set_ $name>](&mut self, value: $type) -> () {
-            //     paste! [self. $field] = (value).as_();
-            // }
+            fn [<set_ $name>](&mut self, value: $type) -> () {
+                paste! [self. $field] = (value).as_();
+            }
         }
     };
 }
@@ -117,8 +117,8 @@ pub struct ElfHeader<Addr, Offset> {
 
 impl<Addr, Offset> ElfHeader<Addr, Offset>
 where
-    Addr: Zero + NumCast + AsPrimitive<u64> + Num,
-    Offset: Zero + NumCast + AsPrimitive<u64> + Num,
+    Addr: Zero + AsPrimitive<u64>,
+    Offset: Zero + AsPrimitive<u64>,
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
         ElfHeader::<Addr, Offset> {
@@ -159,8 +159,10 @@ where
 
 impl<Addr, Offset> ElfHeaderTrait for ElfHeader<Addr, Offset>
 where
-    Addr: NumCast + Copy + AsPrimitive<u64>,
-    Offset: NumCast + Copy + AsPrimitive<u64>,
+    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
+    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
+    Addr: AsPrimitive<u64> + Copy + 'static,
+    Offset: AsPrimitive<u64> + Copy + 'static,
 {
     fn load(&mut self, reader: &mut File) -> io::Result<()> {
         let num_bytes = ::std::mem::size_of::<Self>();

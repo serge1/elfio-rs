@@ -34,7 +34,7 @@ pub use types::*;
 macro_rules! ELFIO_HEADER_ACCESS_GET {
     ($type: ident, $name: ident) => {
         paste! {
-            /// Access to the corresponding ELF header field
+            /// Read access to the corresponding ELF header field
             pub fn [<get_ $name>](&self) -> $type {
                 match &self.header {
                   Some(h) => h.[<get_ $name>](),
@@ -48,14 +48,21 @@ macro_rules! ELFIO_HEADER_ACCESS_GET {
 macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
     ($type: ident, $name: ident) => {
         paste! {
-            /// Access to the corresponding ELF header field
+            /// Read access to the corresponding ELF header field
             pub fn [<get_ $name>](&self) -> $type {
                 match &self.header {
                   Some(h) => h.[<get_ $name>](),
                   None => 0
                 }
             }
-            // fn [<set_ $name>](&mut self, value: $type) -> ();
+
+            /// Write access to the corresponding ELF header field
+            pub fn [<set_ $name>](&mut self, value: $type) -> () {
+                match &self.header {
+                  Some(_) => self.header.as_mut().unwrap().[<set_ $name>](value),
+                  None => ()
+                }
+            }
         }
     };
 }

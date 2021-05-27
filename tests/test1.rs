@@ -84,3 +84,40 @@ fn header_read_le_64() -> io::Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn header_write_read_le_32() -> io::Result<()> {
+    let mut elf_file = File::open("tests/files/hello_32")?;
+
+    let mut elfio = Elfio::new();
+
+    elfio.load(&mut elf_file)?;
+
+    elfio.set_version(1000);
+    elfio.set_os_abi(83);
+    elfio.set_abi_version(84);
+    elfio.set_type(1003);
+    elfio.set_machine(1005);
+    elfio.set_flags(1006);
+    elfio.set_entry(1007);
+    elfio.set_sections_num(1008);
+    elfio.set_sections_offset(1009);
+    elfio.set_segments_num(10010);
+    elfio.set_segments_offset(10011);
+    elfio.set_section_name_str_index(10012);
+
+    assert_eq!(elfio.get_version(), 1000);
+    assert_eq!(elfio.get_os_abi(), 83);
+    assert_eq!(elfio.get_abi_version(), 84);
+    assert_eq!(elfio.get_type(), 1003);
+    assert_eq!(elfio.get_machine(), 1005);
+    assert_eq!(elfio.get_flags(), 1006);
+    assert_eq!(elfio.get_entry(), 1007);
+    assert_eq!(elfio.get_sections_num(), 1008);
+    assert_eq!(elfio.get_sections_offset(), 1009);
+    assert_eq!(elfio.get_segments_num(), 10010);
+    assert_eq!(elfio.get_segments_offset(), 10011);
+    assert_eq!(elfio.get_section_name_str_index(), 10012);
+
+    Ok(())
+}
