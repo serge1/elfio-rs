@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 mod header;
-pub mod types;
+mod types;
 mod utils;
 
 use header::*;
