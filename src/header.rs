@@ -7,8 +7,12 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::slice;
-
 use super::types::*;
+use std::convert::TryInto;
+
+// File version
+// pub const EV_NONE: u8 = 0;
+pub const EV_CURRENT: u8 = 1;
 
 // Identification index
 pub const EI_MAG0: usize = 0;
@@ -130,7 +134,24 @@ where
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
         ElfHeader::<Addr, Offset> {
-            e_ident: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            e_ident: [
+                ELFMAG0,
+                ELFMAG1,
+                ELFMAG2,
+                ELFMAG3,
+                ELFCLASS32,
+                ELFDATA2LSB,
+                EV_CURRENT,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ],
             e_type: 0,
             e_machine: 0,
             e_version: 0,
