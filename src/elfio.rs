@@ -1,12 +1,40 @@
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use paste::paste;
 
 use super::header::*;
 pub use super::types::*;
 
+macro_rules! ELFIO_HEADER_ACCESS_GET {
+    ($type: ident, $name: ident) => {
+        paste! {
+            pub fn [<get_ $name>](&self) -> $type {
+                match &self.header {
+                  Some(h) => h.[<get_ $name>](),
+                  None => 0
+                }
+            }
+        }
+    };
+}
+
+macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
+    ($type: ident, $name: ident) => {
+        paste! {
+            pub fn [<get_ $name>](&self) -> $type {
+                match &self.header {
+                  Some(h) => h.[<get_ $name>](),
+                  None => 0
+                }
+            }
+            // fn [<set_ $name>](&mut self, value: $type) -> ();
+        }
+    };
+}
+
 pub struct Elfio {
-    pub header: Option<Box<dyn ElfHeaderTrait>>,
+    header: Option<Box<dyn ElfHeaderTrait>>,
 }
 
 impl Elfio {
@@ -14,7 +42,7 @@ impl Elfio {
         Elfio { header: None }
     }
 
-    pub fn load(&mut self, mut buffer: File) -> io::Result<()> {
+    pub fn load(&mut self, buffer: &mut File) -> io::Result<()> {
         let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
         // Read ELF file signature
         buffer.read_exact(&mut e_ident)?;
@@ -52,11 +80,31 @@ impl Elfio {
             self.header = Some(Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new()));
         }
 
-        match self.header.as_mut().unwrap().load(&mut buffer) {
+        match self.header.as_mut().unwrap().load(buffer) {
             Ok(_) => (),
             Err(e) => return Err(e),
         }
 
         Ok(())
     }
+
+    ELFIO_HEADER_ACCESS_GET!(u8, class);
+    ELFIO_HEADER_ACCESS_GET!(u8, elf_version);
+    ELFIO_HEADER_ACCESS_GET!(u8, encoding);
+    ELFIO_HEADER_ACCESS_GET!(ElfHalf, header_size);
+    ELFIO_HEADER_ACCESS_GET!(ElfHalf, section_entry_size);
+    ELFIO_HEADER_ACCESS_GET!(ElfHalf, segment_entry_size);
+
+    ELFIO_HEADER_ACCESS_GET_SET!(ElfWord, version);
+    ELFIO_HEADER_ACCESS_GET_SET!(u8, os_abi);
+    ELFIO_HEADER_ACCESS_GET_SET!(u8, abi_version);
+    ELFIO_HEADER_ACCESS_GET_SET!(ElfHalf, type);
+    ELFIO_HEADER_ACCESS_GET_SET!(ElfHalf, machine);
+    ELFIO_HEADER_ACCESS_GET_SET!(ElfWord, flags);
+    ELFIO_HEADER_ACCESS_GET_SET!(Elf64Addr, entry);
+    ELFIO_HEADER_ACCESS_GET_SET!(ElfHalf, sections_num);
+    ELFIO_HEADER_ACCESS_GET_SET!(Elf64Off, sections_offset);
+    ELFIO_HEADER_ACCESS_GET_SET!(ElfHalf, segments_num);
+    ELFIO_HEADER_ACCESS_GET_SET!(Elf64Off, segments_offset);
+    ELFIO_HEADER_ACCESS_GET_SET!(ElfHalf, section_name_str_index);
 }

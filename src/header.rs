@@ -1,7 +1,7 @@
 extern crate num;
 
-use num::{NumCast, Zero};
 use num::cast::AsPrimitive;
+use num::{Num, NumCast, Zero};
 use paste::paste;
 use std::fs::File;
 use std::io;
@@ -17,9 +17,9 @@ pub const EI_MAG2: usize = 2;
 pub const EI_MAG3: usize = 3;
 pub const EI_CLASS: usize = 4;
 pub const EI_DATA: usize = 5;
-// pub const EI_VERSION: usize = 6;
-// pub const EI_OSABI: usize = 7;
-// pub const EI_ABIVERSION: usize = 8;
+pub const EI_VERSION: usize = 6;
+pub const EI_OSABI: usize = 7;
+pub const EI_ABIVERSION: usize = 8;
 // pub const EI_PAD: usize = 9;
 pub const EI_NIDENT: usize = 16;
 
@@ -38,6 +38,70 @@ pub const ELFCLASS64: u8 = 2;
 //pub const ELFDATANONE: u8 = 0;
 pub const ELFDATA2LSB: u8 = 1;
 pub const ELFDATA2MSB: u8 = 2;
+
+macro_rules! ELFIO_GET_ACCESS_DECL {
+    ($type: ident, $name: ident) => {
+        paste! {
+            fn [<get_ $name>](&self) -> $type;
+        }
+    };
+}
+
+macro_rules! ELFIO_GET_SET_ACCESS_DECL {
+    ($type: ident, $name: ident) => {
+        paste! {
+            fn [<get_ $name>](&self) -> $type;
+            // fn [<set_ $name>](&mut self, value: $type) -> ();
+        }
+    };
+}
+
+macro_rules! ELFIO_GET_ACCESS {
+    ($type: ident, $name: ident, $field: expr) => {
+        paste! {
+            fn [<get_ $name>](&self) -> $type {
+                paste! [self. $field].as_()
+            }
+        }
+    };
+}
+
+macro_rules! ELFIO_GET_SET_ACCESS {
+    ($type: ident, $name: ident, $field: expr) => {
+        paste! {
+            fn [<get_ $name>](&self) -> $type {
+                paste! [self. $field].as_()
+            }
+            // fn [<set_ $name>](&mut self, value: $type) -> () {
+            //     paste! [self. $field] = (value).as_();
+            // }
+        }
+    };
+}
+
+pub trait ElfHeaderTrait {
+    fn load(&mut self, reader: &mut File) -> io::Result<()>;
+
+    ELFIO_GET_ACCESS_DECL!(u8, class);
+    ELFIO_GET_ACCESS_DECL!(u8, elf_version);
+    ELFIO_GET_ACCESS_DECL!(u8, encoding);
+    ELFIO_GET_ACCESS_DECL!(ElfHalf, header_size);
+    ELFIO_GET_ACCESS_DECL!(ElfHalf, section_entry_size);
+    ELFIO_GET_ACCESS_DECL!(ElfHalf, segment_entry_size);
+
+    ELFIO_GET_SET_ACCESS_DECL!(ElfWord, version);
+    ELFIO_GET_SET_ACCESS_DECL!(u8, os_abi);
+    ELFIO_GET_SET_ACCESS_DECL!(u8, abi_version);
+    ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, type);
+    ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, machine);
+    ELFIO_GET_SET_ACCESS_DECL!(ElfWord, flags);
+    ELFIO_GET_SET_ACCESS_DECL!(Elf64Addr, entry);
+    ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, sections_num);
+    ELFIO_GET_SET_ACCESS_DECL!(Elf64Off, sections_offset);
+    ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, segments_num);
+    ELFIO_GET_SET_ACCESS_DECL!(Elf64Off, segments_offset);
+    ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
+}
 
 // ELF file header
 #[repr(C)]
@@ -59,47 +123,10 @@ pub struct ElfHeader<Addr, Offset> {
     e_shstrndx: ElfHalf,
 }
 
-macro_rules! GET_SET_ACCESS_DECL {
-    ($type: ident, $name: ident) => {
-        paste! {
-            fn [<get_ $name>](&self) -> $type;
-        }
-    };
-}
-
-macro_rules! GET_SET_ACCESS {
-    ($type: ident, $name: ident, $field: ident) => {
-        paste! {
-            fn [<get_ $name>](&self) -> $type {
-                paste! [self. $field].as_()
-            }
-        }
-    };
-}
-
-pub trait ElfHeaderTrait {
-    fn load(&mut self, buffer: &mut File) -> io::Result<()>;
-
-    GET_SET_ACCESS_DECL!(u8, class);
-
-    GET_SET_ACCESS_DECL!(ElfWord, version);
-    // GET_SET_ACCESS_DECL!(u8, os_abi);
-    // GET_SET_ACCESS_DECL!(u8, abi_version);
-    GET_SET_ACCESS_DECL!(ElfHalf, type);
-    GET_SET_ACCESS_DECL!(ElfHalf, machine);
-    GET_SET_ACCESS_DECL!(ElfWord, flags);
-    GET_SET_ACCESS_DECL!(Elf64Addr, entry);
-    GET_SET_ACCESS_DECL!(ElfHalf, sections_num);
-    GET_SET_ACCESS_DECL!(Elf64Off, sections_offset);
-    GET_SET_ACCESS_DECL!(ElfHalf, segments_num);
-    GET_SET_ACCESS_DECL!(Elf64Off, segments_offset);
-    GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
-}
-
 impl<Addr, Offset> ElfHeader<Addr, Offset>
 where
-    Addr: Zero + NumCast + AsPrimitive<u64>,
-    Offset: Zero + NumCast + AsPrimitive<u64>,
+    Addr: Zero + NumCast + AsPrimitive<u64> + Num,
+    Offset: Zero + NumCast + AsPrimitive<u64> + Num,
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
         ElfHeader::<Addr, Offset> {
@@ -128,7 +155,6 @@ where
 {
     fn load(&mut self, reader: &mut File) -> io::Result<()> {
         let num_bytes = ::std::mem::size_of::<Self>();
-        println!("{}", num_bytes);
         unsafe {
             let ptr = slice::from_raw_parts_mut(self as *mut Self as *mut u8, num_bytes);
             reader.read_exact(ptr)?;
@@ -136,20 +162,23 @@ where
         Ok(())
     }
 
-    GET_SET_ACCESS!(ElfWord, version, e_version);
-    // GET_SET_ACCESS!(u8, os_abi, e_ident[EI_OSABI]);
-    // GET_SET_ACCESS!(u8, abi_version, e_ident[EI_ABIVERSION]);
-    GET_SET_ACCESS!(ElfHalf, type, e_type);
-    GET_SET_ACCESS!(ElfHalf, machine, e_machine);
-    GET_SET_ACCESS!(ElfWord, flags, e_flags);
-    GET_SET_ACCESS!(ElfHalf, section_name_str_index, e_shstrndx);
-    GET_SET_ACCESS!(Elf64Addr, entry, e_entry);
-    GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
-    GET_SET_ACCESS!(Elf64Off, sections_offset, e_shoff);
-    GET_SET_ACCESS!(ElfHalf, segments_num, e_phnum);
-    GET_SET_ACCESS!(Elf64Off, segments_offset, e_phoff);
+    ELFIO_GET_ACCESS!(u8, class, e_ident[EI_CLASS]);
+    ELFIO_GET_ACCESS!(u8, elf_version, e_ident[EI_VERSION]);
+    ELFIO_GET_ACCESS!(u8, encoding, e_ident[EI_DATA]);
+    ELFIO_GET_ACCESS!(ElfHalf, header_size, e_ehsize);
+    ELFIO_GET_ACCESS!(ElfHalf, section_entry_size, e_shentsize);
+    ELFIO_GET_ACCESS!(ElfHalf, segment_entry_size, e_phentsize);
 
-    fn get_class(&self) -> u8 {
-        self.e_ident[EI_CLASS]
-    }
+    ELFIO_GET_SET_ACCESS!(ElfWord, version, e_version);
+    ELFIO_GET_SET_ACCESS!(u8, os_abi, e_ident[EI_OSABI]);
+    ELFIO_GET_SET_ACCESS!(u8, abi_version, e_ident[EI_ABIVERSION]);
+    ELFIO_GET_SET_ACCESS!(ElfHalf, type, e_type);
+    ELFIO_GET_SET_ACCESS!(ElfHalf, machine, e_machine);
+    ELFIO_GET_SET_ACCESS!(ElfWord, flags, e_flags);
+    ELFIO_GET_SET_ACCESS!(ElfHalf, section_name_str_index, e_shstrndx);
+    ELFIO_GET_SET_ACCESS!(Elf64Addr, entry, e_entry);
+    ELFIO_GET_SET_ACCESS!(ElfHalf, sections_num, e_shnum);
+    ELFIO_GET_SET_ACCESS!(Elf64Off, sections_offset, e_shoff);
+    ELFIO_GET_SET_ACCESS!(ElfHalf, segments_num, e_phnum);
+    ELFIO_GET_SET_ACCESS!(Elf64Off, segments_offset, e_phoff);
 }

@@ -1,5 +1,5 @@
 [package]
-name = "elfio-rs"
+name = "elfio"
 version = "0.1.0"
 authors = ["Serge Lamikhov-Center <to_serge@hotmail.com>"]
 edition = "2018"
@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 paste = "1.0.5"
-num = "0.2.0"
+num = "0.4.0"
