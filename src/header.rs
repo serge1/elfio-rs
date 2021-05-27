@@ -22,6 +22,7 @@ THE SOFTWARE.
 
 extern crate num;
 
+use super::types::*;
 use num::cast::AsPrimitive;
 use num::{Num, NumCast, Zero};
 use paste::paste;
@@ -29,7 +30,6 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::slice;
-use super::types::*;
 
 macro_rules! ELFIO_GET_ACCESS_DECL {
     ($type: ident, $name: ident) => {

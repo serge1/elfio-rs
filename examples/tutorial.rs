@@ -35,13 +35,13 @@ fn main() -> io::Result<()> {
     match reader.get_class() {
         elfio::ELFCLASS32 => println!("32-bit ELF file"),
         elfio::ELFCLASS64 => println!("64-bit ELF file"),
-        _ => println!("ELF class is not recognized")
+        _ => println!("ELF class is not recognized"),
     }
 
     match reader.get_encoding() {
         elfio::ELFDATA2LSB => println!("LSB ELF file"),
         elfio::ELFDATA2MSB => println!("MSB ELF file"),
-        _ => println!("ELF endianess is not recognized")
+        _ => println!("ELF endianess is not recognized"),
     }
 
     println!("Start address: 0x{:08X}", reader.get_entry());

@@ -20,21 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-pub mod types;
 mod header;
+pub mod types;
 mod utils;
 
+use header::*;
+use paste::paste;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
-use paste::paste;
-use header::*;
 pub use types::*;
 
 macro_rules! ELFIO_HEADER_ACCESS_GET {
     ($type: ident, $name: ident) => {
         paste! {
-            /// Access to the corresponding ELF header field 
+            /// Access to the corresponding ELF header field
             pub fn [<get_ $name>](&self) -> $type {
                 match &self.header {
                   Some(h) => h.[<get_ $name>](),
@@ -48,7 +48,7 @@ macro_rules! ELFIO_HEADER_ACCESS_GET {
 macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
     ($type: ident, $name: ident) => {
         paste! {
-            /// Access to the corresponding ELF header field 
+            /// Access to the corresponding ELF header field
             pub fn [<get_ $name>](&self) -> $type {
                 match &self.header {
                   Some(h) => h.[<get_ $name>](),
@@ -59,7 +59,6 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
         }
     };
 }
-
 
 /// Elfio - the main struct of the library
 pub struct Elfio {
