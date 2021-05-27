@@ -23,7 +23,7 @@ THE SOFTWARE.
 use std::fs::File;
 use std::io;
 
-use elfio::elfio::Elfio;
+use elfio::Elfio;
 
 #[test]
 fn header_read_le_32() -> io::Result<()> {

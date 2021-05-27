@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Serge Lamikhov-Center <to_serge@hotmail.com>"]
 edition = "2018"
 
+[lib]
+name = "elfio"
+path = "src/elfio.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

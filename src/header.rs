@@ -30,40 +30,6 @@ use std::io;
 use std::io::prelude::*;
 use std::slice;
 use super::types::*;
-use std::convert::TryInto;
-
-// File version
-// pub const EV_NONE: u8 = 0;
-pub const EV_CURRENT: u8 = 1;
-
-// Identification index
-pub const EI_MAG0: usize = 0;
-pub const EI_MAG1: usize = 1;
-pub const EI_MAG2: usize = 2;
-pub const EI_MAG3: usize = 3;
-pub const EI_CLASS: usize = 4;
-pub const EI_DATA: usize = 5;
-pub const EI_VERSION: usize = 6;
-pub const EI_OSABI: usize = 7;
-pub const EI_ABIVERSION: usize = 8;
-// pub const EI_PAD: usize = 9;
-pub const EI_NIDENT: usize = 16;
-
-// Magic number
-pub const ELFMAG0: u8 = 0x7F;
-pub const ELFMAG1: u8 = 'E' as u8;
-pub const ELFMAG2: u8 = 'L' as u8;
-pub const ELFMAG3: u8 = 'F' as u8;
-
-// File class
-//pub const ELFCLASSNONE: u8 = 0;
-pub const ELFCLASS32: u8 = 1;
-pub const ELFCLASS64: u8 = 2;
-
-// Encoding
-//pub const ELFDATANONE: u8 = 0;
-pub const ELFDATA2LSB: u8 = 1;
-pub const ELFDATA2MSB: u8 = 2;
 
 macro_rules! ELFIO_GET_ACCESS_DECL {
     ($type: ident, $name: ident) => {

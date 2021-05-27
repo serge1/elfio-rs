@@ -20,17 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+pub mod types;
+mod header;
+mod utils;
+
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use paste::paste;
-
-use super::header::*;
-pub use super::types::*;
+use header::*;
+pub use types::*;
 
 macro_rules! ELFIO_HEADER_ACCESS_GET {
     ($type: ident, $name: ident) => {
         paste! {
+            /// Access to the corresponding ELF header field 
             pub fn [<get_ $name>](&self) -> $type {
                 match &self.header {
                   Some(h) => h.[<get_ $name>](),
@@ -44,6 +48,7 @@ macro_rules! ELFIO_HEADER_ACCESS_GET {
 macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
     ($type: ident, $name: ident) => {
         paste! {
+            /// Access to the corresponding ELF header field 
             pub fn [<get_ $name>](&self) -> $type {
                 match &self.header {
                   Some(h) => h.[<get_ $name>](),
@@ -55,15 +60,19 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
     };
 }
 
+
+/// Elfio - the main struct of the library
 pub struct Elfio {
     header: Option<Box<dyn ElfHeaderTrait>>,
 }
 
 impl Elfio {
+    /// Create new instance of the structure
     pub fn new() -> Elfio {
         Elfio { header: None }
     }
 
+    /// Load the structure from input stream
     pub fn load(&mut self, buffer: &mut File) -> io::Result<()> {
         let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
         // Read ELF file signature
