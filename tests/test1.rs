@@ -29,28 +29,28 @@ use elfio::Elfio;
 fn header_read_le_32() -> io::Result<()> {
     let mut elf_file = File::open("tests/files/hello_32")?;
 
-    let mut elfio = Elfio::new();
+    let mut elf = Elfio::new();
 
-    elfio.load(&mut elf_file)?;
+    elf.load(&mut elf_file)?;
 
-    assert_eq!(elfio.get_class(), 1);
-    assert_eq!(elfio.get_elf_version(), 1);
-    assert_eq!(elfio.get_encoding(), 1);
-    assert_eq!(elfio.get_header_size(), 52);
-    assert_eq!(elfio.get_section_entry_size(), 40);
-    assert_eq!(elfio.get_segment_entry_size(), 32);
-    assert_eq!(elfio.get_version(), 1);
-    assert_eq!(elfio.get_os_abi(), 0);
-    assert_eq!(elfio.get_abi_version(), 0);
-    assert_eq!(elfio.get_type(), 2);
-    assert_eq!(elfio.get_machine(), 3);
-    assert_eq!(elfio.get_flags(), 0);
-    assert_eq!(elfio.get_entry(), 0x80482b0);
-    assert_eq!(elfio.get_sections_num(), 28);
-    assert_eq!(elfio.get_sections_offset(), 1912);
-    assert_eq!(elfio.get_segments_num(), 7);
-    assert_eq!(elfio.get_segments_offset(), 52);
-    assert_eq!(elfio.get_section_name_str_index(), 25);
+    assert_eq!(elf.get_class(), 1);
+    assert_eq!(elf.get_elf_version(), 1);
+    assert_eq!(elf.get_encoding(), 1);
+    assert_eq!(elf.get_header_size(), 52);
+    assert_eq!(elf.get_section_entry_size(), 40);
+    assert_eq!(elf.get_segment_entry_size(), 32);
+    assert_eq!(elf.get_version(), 1);
+    assert_eq!(elf.get_os_abi(), 0);
+    assert_eq!(elf.get_abi_version(), 0);
+    assert_eq!(elf.get_type(), 2);
+    assert_eq!(elf.get_machine(), 3);
+    assert_eq!(elf.get_flags(), 0);
+    assert_eq!(elf.get_entry(), 0x80482b0);
+    assert_eq!(elf.get_sections_num(), 28);
+    assert_eq!(elf.get_sections_offset(), 1912);
+    assert_eq!(elf.get_segments_num(), 7);
+    assert_eq!(elf.get_segments_offset(), 52);
+    assert_eq!(elf.get_section_name_str_index(), 25);
 
     Ok(())
 }
@@ -59,28 +59,28 @@ fn header_read_le_32() -> io::Result<()> {
 fn header_read_le_64() -> io::Result<()> {
     let mut elf_file = File::open("tests/files/hello_64")?;
 
-    let mut elfio = Elfio::new();
+    let mut elf = Elfio::new();
 
-    elfio.load(&mut elf_file)?;
+    elf.load(&mut elf_file)?;
 
-    assert_eq!(elfio.get_class(), 2);
-    assert_eq!(elfio.get_elf_version(), 1);
-    assert_eq!(elfio.get_encoding(), 1);
-    assert_eq!(elfio.get_header_size(), 64);
-    assert_eq!(elfio.get_section_entry_size(), 64);
-    assert_eq!(elfio.get_segment_entry_size(), 56);
-    assert_eq!(elfio.get_version(), 1);
-    assert_eq!(elfio.get_os_abi(), 0);
-    assert_eq!(elfio.get_abi_version(), 0);
-    assert_eq!(elfio.get_type(), 2);
-    assert_eq!(elfio.get_machine(), 62);
-    assert_eq!(elfio.get_flags(), 0);
-    assert_eq!(elfio.get_entry(), 0x4003c0);
-    assert_eq!(elfio.get_sections_num(), 29);
-    assert_eq!(elfio.get_sections_offset(), 2656);
-    assert_eq!(elfio.get_segments_num(), 8);
-    assert_eq!(elfio.get_segments_offset(), 64);
-    assert_eq!(elfio.get_section_name_str_index(), 26);
+    assert_eq!(elf.get_class(), 2);
+    assert_eq!(elf.get_elf_version(), 1);
+    assert_eq!(elf.get_encoding(), 1);
+    assert_eq!(elf.get_header_size(), 64);
+    assert_eq!(elf.get_section_entry_size(), 64);
+    assert_eq!(elf.get_segment_entry_size(), 56);
+    assert_eq!(elf.get_version(), 1);
+    assert_eq!(elf.get_os_abi(), 0);
+    assert_eq!(elf.get_abi_version(), 0);
+    assert_eq!(elf.get_type(), 2);
+    assert_eq!(elf.get_machine(), 62);
+    assert_eq!(elf.get_flags(), 0);
+    assert_eq!(elf.get_entry(), 0x4003c0);
+    assert_eq!(elf.get_sections_num(), 29);
+    assert_eq!(elf.get_sections_offset(), 2656);
+    assert_eq!(elf.get_segments_num(), 8);
+    assert_eq!(elf.get_segments_offset(), 64);
+    assert_eq!(elf.get_section_name_str_index(), 26);
 
     Ok(())
 }
@@ -89,35 +89,35 @@ fn header_read_le_64() -> io::Result<()> {
 fn header_write_read_le_32() -> io::Result<()> {
     let mut elf_file = File::open("tests/files/hello_32")?;
 
-    let mut elfio = Elfio::new();
+    let mut elf = Elfio::new();
 
-    elfio.load(&mut elf_file)?;
+    elf.load(&mut elf_file)?;
 
-    elfio.set_version(1000);
-    elfio.set_os_abi(83);
-    elfio.set_abi_version(84);
-    elfio.set_type(1003);
-    elfio.set_machine(1005);
-    elfio.set_flags(1006);
-    elfio.set_entry(1007);
-    elfio.set_sections_num(1008);
-    elfio.set_sections_offset(1009);
-    elfio.set_segments_num(10010);
-    elfio.set_segments_offset(10011);
-    elfio.set_section_name_str_index(10012);
+    elf.set_version(1000);
+    elf.set_os_abi(83);
+    elf.set_abi_version(84);
+    elf.set_type(1003);
+    elf.set_machine(1005);
+    elf.set_flags(1006);
+    elf.set_entry(1007);
+    elf.set_sections_num(1008);
+    elf.set_sections_offset(1009);
+    elf.set_segments_num(10010);
+    elf.set_segments_offset(10011);
+    elf.set_section_name_str_index(10012);
 
-    assert_eq!(elfio.get_version(), 1000);
-    assert_eq!(elfio.get_os_abi(), 83);
-    assert_eq!(elfio.get_abi_version(), 84);
-    assert_eq!(elfio.get_type(), 1003);
-    assert_eq!(elfio.get_machine(), 1005);
-    assert_eq!(elfio.get_flags(), 1006);
-    assert_eq!(elfio.get_entry(), 1007);
-    assert_eq!(elfio.get_sections_num(), 1008);
-    assert_eq!(elfio.get_sections_offset(), 1009);
-    assert_eq!(elfio.get_segments_num(), 10010);
-    assert_eq!(elfio.get_segments_offset(), 10011);
-    assert_eq!(elfio.get_section_name_str_index(), 10012);
+    assert_eq!(elf.get_version(), 1000);
+    assert_eq!(elf.get_os_abi(), 83);
+    assert_eq!(elf.get_abi_version(), 84);
+    assert_eq!(elf.get_type(), 1003);
+    assert_eq!(elf.get_machine(), 1005);
+    assert_eq!(elf.get_flags(), 1006);
+    assert_eq!(elf.get_entry(), 1007);
+    assert_eq!(elf.get_sections_num(), 1008);
+    assert_eq!(elf.get_sections_offset(), 1009);
+    assert_eq!(elf.get_segments_num(), 10010);
+    assert_eq!(elf.get_segments_offset(), 10011);
+    assert_eq!(elf.get_section_name_str_index(), 10012);
 
     Ok(())
 }

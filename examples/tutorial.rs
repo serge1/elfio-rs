@@ -23,16 +23,16 @@ THE SOFTWARE.
 use std::fs::File;
 use std::io;
 
-use elfio;
+use elfio::Elfio;
 
 fn main() -> io::Result<()> {
     let mut elf_file = File::open("tests/files/hello_64")?;
 
-    let mut reader = elfio::Elfio::new();
+    let mut elf = Elfio::new();
 
-    reader.load(&mut elf_file)?;
+    elf.load(&mut elf_file)?;
 
-    match reader.get_type() {
+    match elf.get_type() {
         elfio::ET_REL => println!("Object ELF file"),
         elfio::ET_EXEC => println!("Executable ELF file"),
         elfio::ET_DYN => println!("Shared library ELF file"),
@@ -40,19 +40,19 @@ fn main() -> io::Result<()> {
         _ => println!("ELF type is not recognized"),
     }
 
-    match reader.get_class() {
+    match elf.get_class() {
         elfio::ELFCLASS32 => println!("32-bit ELF file"),
         elfio::ELFCLASS64 => println!("64-bit ELF file"),
         _ => println!("ELF class is not recognized"),
     }
 
-    match reader.get_encoding() {
+    match elf.get_encoding() {
         elfio::ELFDATA2LSB => println!("LSB ELF file"),
         elfio::ELFDATA2MSB => println!("MSB ELF file"),
         _ => println!("ELF endianess is not recognized"),
     }
 
-    println!("Start address: 0x{:08X}", reader.get_entry());
+    println!("Start address: 0x{:08X}", elf.get_entry());
 
     Ok(())
 }
