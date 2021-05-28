@@ -4,9 +4,6 @@
 
 - Start to use endianness converter
 - Investigate use std::convert::TryInto
-- Learn and add documentation
-- Try to move 'load' function to a separate trait
-  with default implementation
 
 ## Done
 
@@ -18,3 +15,6 @@
   initialization will be done during implemention of 'save' functions
 - Add Copyright notes
 - Implement 'set' functions for ELF header
+- Try to move 'load' function to a separate trait
+  The default implementation cannot be done - it requires type Size
+- Learn and add documentation

@@ -23,14 +23,22 @@ THE SOFTWARE.
 use std::fs::File;
 use std::io;
 
-use elfio::*;
+use elfio;
 
 fn main() -> io::Result<()> {
     let mut elf_file = File::open("tests/files/hello_64")?;
 
-    let mut reader = Elfio::new();
+    let mut reader = elfio::Elfio::new();
 
     reader.load(&mut elf_file)?;
+
+    match reader.get_type() {
+        elfio::ET_REL => println!("Object ELF file"),
+        elfio::ET_EXEC => println!("Executable ELF file"),
+        elfio::ET_DYN => println!("Shared library ELF file"),
+        elfio::ET_CORE => println!("Core ELF file"),
+        _ => println!("ELF type is not recognized"),
+    }
 
     match reader.get_class() {
         elfio::ELFCLASS32 => println!("32-bit ELF file"),

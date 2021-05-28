@@ -23,6 +23,7 @@ THE SOFTWARE.
 extern crate num;
 
 use super::types::*;
+use super::utils::*;
 use num::cast::AsPrimitive;
 use num::{Num, Zero};
 use paste::paste;
@@ -71,9 +72,7 @@ macro_rules! ELFIO_GET_SET_ACCESS {
     };
 }
 
-pub trait ElfHeaderTrait {
-    fn load(&mut self, reader: &mut File) -> io::Result<()>;
-
+pub trait ElfHeaderAccessTrait {
     ELFIO_GET_ACCESS_DECL!(u8, class);
     ELFIO_GET_ACCESS_DECL!(u8, elf_version);
     ELFIO_GET_ACCESS_DECL!(u8, encoding);
@@ -94,6 +93,8 @@ pub trait ElfHeaderTrait {
     ELFIO_GET_SET_ACCESS_DECL!(Elf64Off, segments_offset);
     ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
 }
+
+pub trait ElfHeaderTrait: ElfHeaderAccessTrait + Load {}
 
 // ELF file header
 #[repr(C)]
@@ -127,9 +128,9 @@ where
                 ELFMAG1,
                 ELFMAG2,
                 ELFMAG3,
-                ELFCLASS32,
-                ELFDATA2LSB,
-                EV_CURRENT,
+                ELFCLASSNONE,
+                ELFDATANONE,
+                EV_NONE,
                 0,
                 0,
                 0,
@@ -164,15 +165,15 @@ where
     Addr: AsPrimitive<u64> + Copy + 'static,
     Offset: AsPrimitive<u64> + Copy + 'static,
 {
-    fn load(&mut self, reader: &mut File) -> io::Result<()> {
-        let num_bytes = ::std::mem::size_of::<Self>();
-        unsafe {
-            let ptr = slice::from_raw_parts_mut(self as *mut Self as *mut u8, num_bytes);
-            reader.read_exact(ptr)?;
-        }
-        Ok(())
-    }
+}
 
+impl<Addr, Offset> ElfHeaderAccessTrait for ElfHeader<Addr, Offset>
+where
+    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
+    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
+    Addr: AsPrimitive<u64> + Copy + 'static,
+    Offset: AsPrimitive<u64> + Copy + 'static,
+{
     ELFIO_GET_ACCESS!(u8, class, e_ident[EI_CLASS]);
     ELFIO_GET_ACCESS!(u8, elf_version, e_ident[EI_VERSION]);
     ELFIO_GET_ACCESS!(u8, encoding, e_ident[EI_DATA]);
@@ -192,4 +193,15 @@ where
     ELFIO_GET_SET_ACCESS!(Elf64Off, sections_offset, e_shoff);
     ELFIO_GET_SET_ACCESS!(ElfHalf, segments_num, e_phnum);
     ELFIO_GET_SET_ACCESS!(Elf64Off, segments_offset, e_phoff);
+}
+
+impl<Addr, Offset> Load for ElfHeader<Addr, Offset> {
+    fn load(&mut self, reader: &mut File) -> io::Result<()> {
+        let num_bytes = ::std::mem::size_of::<Self>();
+        unsafe {
+            let ptr = slice::from_raw_parts_mut(self as *mut Self as *mut u8, num_bytes);
+            reader.read_exact(ptr)?;
+        }
+        Ok(())
+    }
 }

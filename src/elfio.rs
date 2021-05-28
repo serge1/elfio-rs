@@ -20,6 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#![warn(missing_docs)]
+//! 'elfio' is a Rust library intended for reading and generating
+//! files in the ELF binary format. The library supports processing
+//! of ELF files for 32- and 64-bit architectures regardless of the
+//! endianess
+
 mod header;
 mod types;
 mod utils;
@@ -36,10 +42,7 @@ macro_rules! ELFIO_HEADER_ACCESS_GET {
         paste! {
             /// Read access to the corresponding ELF header field
             pub fn [<get_ $name>](&self) -> $type {
-                match &self.header {
-                  Some(h) => h.[<get_ $name>](),
-                  None => 0
-                }
+                self.header.[<get_ $name>]()
             }
         }
     };
@@ -50,18 +53,12 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
         paste! {
             /// Read access to the corresponding ELF header field
             pub fn [<get_ $name>](&self) -> $type {
-                match &self.header {
-                  Some(h) => h.[<get_ $name>](),
-                  None => 0
-                }
+                self.header.[<get_ $name>]()
             }
 
             /// Write access to the corresponding ELF header field
             pub fn [<set_ $name>](&mut self, value: $type) -> () {
-                match &self.header {
-                  Some(_) => self.header.as_mut().unwrap().[<set_ $name>](value),
-                  None => ()
-                }
+                self.header.[<set_ $name>](value);
             }
         }
     };
@@ -69,13 +66,15 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 
 /// Elfio - the main struct of the library
 pub struct Elfio {
-    header: Option<Box<dyn ElfHeaderTrait>>,
+    header: Box<dyn ElfHeaderTrait>,
 }
 
 impl Elfio {
-    /// Create new instance of the structure
+    /// Create a new instance
     pub fn new() -> Elfio {
-        Elfio { header: None }
+        Elfio {
+            header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
+        }
     }
 
     /// Load the structure from input stream
@@ -112,12 +111,12 @@ impl Elfio {
         }
 
         if e_ident[EI_CLASS] == ELFCLASS64 {
-            self.header = Some(Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()));
+            self.header = Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new());
         } else {
-            self.header = Some(Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new()));
+            self.header = Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new());
         }
 
-        match self.header.as_mut().unwrap().load(buffer) {
+        match self.header.load(buffer) {
             Ok(_) => (),
             Err(e) => return Err(e),
         }
