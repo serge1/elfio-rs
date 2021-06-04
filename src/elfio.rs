@@ -66,21 +66,21 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 
 /// Elfio - the main struct of the library. All access to ELF files attributes
 /// is done through this object
-/// 
+///
 /// For example:
 /// ```
 /// use std::fs::File;
 /// use std::io;
-/// 
+///
 /// //use elfio;     // It needs to be uncommented in the real code
-/// 
+///
 /// fn main() -> io::Result<()> {
 ///     let mut elf_file = File::open("tests/files/hello_64")?;
-/// 
+///
 ///     let mut reader = elfio::Elfio::new();
-/// 
+///
 ///     reader.load(&mut elf_file)?;
-/// 
+///
 ///     match reader.get_type() {
 ///         elfio::ET_REL => println!("Object ELF file"),
 ///         elfio::ET_EXEC => println!("Executable ELF file"),
@@ -88,7 +88,7 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 ///         elfio::ET_CORE => println!("Core ELF file"),
 ///         _ => println!("ELF type is not recognized"),
 ///     }
-/// 
+///
 ///     Ok(())
 /// }
 /// ```

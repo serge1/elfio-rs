@@ -25,7 +25,7 @@ extern crate num;
 use super::types::*;
 use super::utils::*;
 use num::cast::AsPrimitive;
-use num::{Num, Zero};
+use num::Zero;
 use paste::paste;
 use std::fs::File;
 use std::io;
@@ -118,8 +118,8 @@ pub struct ElfHeader<Addr, Offset> {
 
 impl<Addr, Offset> ElfHeader<Addr, Offset>
 where
-    Addr: Zero + AsPrimitive<u64>,
-    Offset: Zero + AsPrimitive<u64>,
+    Addr: Zero,
+    Offset: Zero,
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
         ElfHeader::<Addr, Offset> {
@@ -160,19 +160,19 @@ where
 
 impl<Addr, Offset> ElfHeaderTrait for ElfHeader<Addr, Offset>
 where
-    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
-    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
-    Addr: AsPrimitive<u64> + Copy + 'static,
-    Offset: AsPrimitive<u64> + Copy + 'static,
+    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
+    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
+    Addr: AsPrimitive<u64>,
+    Offset: AsPrimitive<u64>,
 {
 }
 
 impl<Addr, Offset> ElfHeaderAccessTrait for ElfHeader<Addr, Offset>
 where
-    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
-    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset> + Num + Sized,
-    Addr: AsPrimitive<u64> + Copy + 'static,
-    Offset: AsPrimitive<u64> + Copy + 'static,
+    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
+    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
+    Addr: AsPrimitive<u64>,
+    Offset: AsPrimitive<u64>,
 {
     ELFIO_GET_ACCESS!(u8, class, e_ident[EI_CLASS]);
     ELFIO_GET_ACCESS!(u8, elf_version, e_ident[EI_VERSION]);
