@@ -22,13 +22,64 @@ THE SOFTWARE.
 
 use std::fs::File;
 use std::io;
-use std::io::BufReader;
+use std::io::{BufReader, Read};
 
+// --------------------------------------------------------------------------
 /// The trait for (de)serializing ELF entities
 pub trait Load {
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()>;
 }
 
+// --------------------------------------------------------------------------
+impl Load for u8 {
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        let mut buffer = self.to_ne_bytes();
+        reader.read_exact(&mut buffer)?;
+        *self = u8::from_ne_bytes(buffer);
+
+        Ok(())
+    }
+}
+
+impl Load for u16 {
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        let mut buffer = self.to_ne_bytes();
+        reader.read_exact(&mut buffer)?;
+        *self = u16::from_ne_bytes(buffer);
+
+        Ok(())
+    }
+}
+
+impl Load for u32 {
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        let mut buffer = self.to_ne_bytes();
+        reader.read_exact(&mut buffer)?;
+        *self = u32::from_ne_bytes(buffer);
+
+        Ok(())
+    }
+}
+
+impl Load for u64 {
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        let mut buffer = self.to_ne_bytes();
+        reader.read_exact(&mut buffer)?;
+        *self = u64::from_ne_bytes(buffer);
+
+        Ok(())
+    }
+}
+
+impl Load for &mut [u8; 16] {
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        reader.read_exact(*self)?;
+
+        Ok(())
+    }
+}
+
+// --------------------------------------------------------------------------
 trait Convert<T> {
     fn convert(&self, value: T) -> T;
 }
@@ -37,6 +88,7 @@ pub struct Converter {
     pub is_needed: bool,
 }
 
+// --------------------------------------------------------------------------
 impl Convert<u8> for Converter {
     fn convert(&self, value: u8) -> u8 {
         value
@@ -109,6 +161,7 @@ impl Convert<u64> for Converter {
     }
 }
 
+// --------------------------------------------------------------------------
 #[test]
 fn test_conv() -> () {
     let conv = Converter { is_needed: true };
@@ -128,6 +181,7 @@ fn test_conv() -> () {
     assert_eq!(d, 0xEFCDAB9078563412);
 }
 
+// --------------------------------------------------------------------------
 #[test]
 fn test_no_conv() -> () {
     let conv = Converter { is_needed: false };

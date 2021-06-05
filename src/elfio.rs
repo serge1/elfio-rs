@@ -34,10 +34,10 @@ use header::*;
 use paste::paste;
 use std::fs::File;
 use std::io;
-use std::io::prelude::*;
-use std::io::BufReader;
+use std::io::{prelude::*, BufReader};
 pub use types::*;
 
+// --------------------------------------------------------------------------
 macro_rules! ELFIO_HEADER_ACCESS_GET {
     ($type: ident, $name: ident) => {
         paste! {
@@ -96,11 +96,13 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 /// }
 /// ```
 
+// --------------------------------------------------------------------------
 pub struct Elfio {
     header: Box<dyn ElfHeaderTrait>,
     converter: utils::Converter,
 }
 
+// --------------------------------------------------------------------------
 impl Elfio {
     /// Create a new instance
     pub fn new() -> Elfio {

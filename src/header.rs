@@ -29,10 +29,9 @@ use num::Zero;
 use paste::paste;
 use std::fs::File;
 use std::io;
-use std::io::prelude::*;
 use std::io::BufReader;
-use std::slice;
 
+// --------------------------------------------------------------------------
 macro_rules! ELFIO_GET_ACCESS_DECL {
     ($type: ident, $name: ident) => {
         paste! {
@@ -73,6 +72,7 @@ macro_rules! ELFIO_GET_SET_ACCESS {
     };
 }
 
+// --------------------------------------------------------------------------
 pub trait ElfHeaderAccessTrait {
     ELFIO_GET_ACCESS_DECL!(u8, class);
     ELFIO_GET_ACCESS_DECL!(u8, elf_version);
@@ -95,8 +95,10 @@ pub trait ElfHeaderAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
 }
 
+// --------------------------------------------------------------------------
 pub trait ElfHeaderTrait: ElfHeaderAccessTrait + Load {}
 
+// --------------------------------------------------------------------------
 // ELF file header
 #[repr(C)]
 #[derive(Debug)]
@@ -117,6 +119,7 @@ pub struct ElfHeader<Addr, Offset> {
     e_shstrndx: ElfHalf,
 }
 
+// --------------------------------------------------------------------------
 impl<Addr, Offset> ElfHeader<Addr, Offset>
 where
     Addr: Zero,
@@ -159,15 +162,17 @@ where
     }
 }
 
+// --------------------------------------------------------------------------
 impl<Addr, Offset> ElfHeaderTrait for ElfHeader<Addr, Offset>
 where
     u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
     u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
-    Addr: AsPrimitive<u64>,
-    Offset: AsPrimitive<u64>,
+    Addr: AsPrimitive<u64> + Load,
+    Offset: AsPrimitive<u64> + Load,
 {
 }
 
+// --------------------------------------------------------------------------
 impl<Addr, Offset> ElfHeaderAccessTrait for ElfHeader<Addr, Offset>
 where
     u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
@@ -196,13 +201,28 @@ where
     ELFIO_GET_SET_ACCESS!(Elf64Off, segments_offset, e_phoff);
 }
 
-impl<Addr, Offset> Load for ElfHeader<Addr, Offset> {
+// --------------------------------------------------------------------------
+impl<Addr, Offset> Load for ElfHeader<Addr, Offset>
+where
+    Addr: Load,
+    Offset: Load,
+{
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
-        let num_bytes = ::std::mem::size_of::<Self>();
-        unsafe {
-            let ptr = slice::from_raw_parts_mut(self as *mut Self as *mut u8, num_bytes);
-            reader.read_exact(ptr)?;
-        }
+        (&mut self.e_ident).load(reader)?;
+        self.e_type.load(reader)?;
+        self.e_machine.load(reader)?;
+        self.e_version.load(reader)?;
+        self.e_entry.load(reader)?;
+        self.e_phoff.load(reader)?;
+        self.e_shoff.load(reader)?;
+        self.e_flags.load(reader)?;
+        self.e_ehsize.load(reader)?;
+        self.e_phentsize.load(reader)?;
+        self.e_phnum.load(reader)?;
+        self.e_shentsize.load(reader)?;
+        self.e_shnum.load(reader)?;
+        self.e_shstrndx.load(reader)?;
+
         Ok(())
     }
 }
