@@ -30,6 +30,7 @@ use paste::paste;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use std::io::BufReader;
 use std::slice;
 
 macro_rules! ELFIO_GET_ACCESS_DECL {
@@ -196,7 +197,7 @@ where
 }
 
 impl<Addr, Offset> Load for ElfHeader<Addr, Offset> {
-    fn load(&mut self, reader: &mut File) -> io::Result<()> {
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
         let num_bytes = ::std::mem::size_of::<Self>();
         unsafe {
             let ptr = slice::from_raw_parts_mut(self as *mut Self as *mut u8, num_bytes);

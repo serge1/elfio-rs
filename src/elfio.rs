@@ -35,6 +35,7 @@ use paste::paste;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use std::io::BufReader;
 pub use types::*;
 
 macro_rules! ELFIO_HEADER_ACCESS_GET {
@@ -71,15 +72,17 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 /// ```
 /// use std::fs::File;
 /// use std::io;
+/// use std::io::BufReader;
 ///
 /// //use elfio;     // It needs to be uncommented in the real code
 ///
 /// fn main() -> io::Result<()> {
-///     let mut elf_file = File::open("tests/files/hello_64")?;
+///     let elf_file = File::open("tests/files/hello_64")?;
+///     let mut file_reader = BufReader::new(elf_file);
 ///
 ///     let mut reader = elfio::Elfio::new();
 ///
-///     reader.load(&mut elf_file)?;
+///     reader.load(&mut file_reader)?;
 ///
 ///     match reader.get_type() {
 ///         elfio::ET_REL => println!("Object ELF file"),
@@ -95,6 +98,7 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 
 pub struct Elfio {
     header: Box<dyn ElfHeaderTrait>,
+    converter: utils::Converter,
 }
 
 impl Elfio {
@@ -102,15 +106,16 @@ impl Elfio {
     pub fn new() -> Elfio {
         Elfio {
             header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
+            converter: utils::Converter { is_needed: false },
         }
     }
 
     /// Load the structure from input stream
-    pub fn load(&mut self, buffer: &mut File) -> io::Result<()> {
+    pub fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
         let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
         // Read ELF file signature
-        buffer.read_exact(&mut e_ident)?;
-        buffer.seek(io::SeekFrom::Start(0))?;
+        reader.read_exact(&mut e_ident)?;
+        reader.seek(io::SeekFrom::Start(0))?;
 
         // Is it ELF file?
         if e_ident[EI_MAG0] != ELFMAG0
@@ -144,9 +149,17 @@ impl Elfio {
             self.header = Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new());
         }
 
-        match self.header.load(buffer) {
+        match self.header.load(reader) {
             Ok(_) => (),
             Err(e) => return Err(e),
+        }
+
+        if !((cfg!(target_endian = "little") && (self.header.get_encoding() != ELFDATA2LSB))
+            || (cfg!(target_endian = "big") && (self.header.get_encoding() != ELFDATA2MSB)))
+        {
+            self.converter.is_needed = false;
+        } else {
+            self.converter.is_needed = true;
         }
 
         Ok(())

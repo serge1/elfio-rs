@@ -22,8 +22,127 @@ THE SOFTWARE.
 
 use std::fs::File;
 use std::io;
+use std::io::BufReader;
 
 /// The trait for (de)serializing ELF entities
 pub trait Load {
-    fn load(&mut self, reader: &mut File) -> io::Result<()>;
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()>;
+}
+
+trait Convert<T> {
+    fn convert(&self, value: T) -> T;
+}
+
+pub struct Converter {
+    pub is_needed: bool,
+}
+
+impl Convert<u8> for Converter {
+    fn convert(&self, value: u8) -> u8 {
+        value
+    }
+}
+
+#[cfg(target_endian = "little")]
+impl Convert<u16> for Converter {
+    fn convert(&self, value: u16) -> u16 {
+        if self.is_needed {
+            value.to_be()
+        } else {
+            value
+        }
+    }
+}
+
+#[cfg(target_endian = "little")]
+impl Convert<u32> for Converter {
+    fn convert(&self, value: u32) -> u32 {
+        if self.is_needed {
+            value.to_be()
+        } else {
+            value
+        }
+    }
+}
+
+#[cfg(target_endian = "little")]
+impl Convert<u64> for Converter {
+    fn convert(&self, value: u64) -> u64 {
+        if self.is_needed {
+            value.to_be()
+        } else {
+            value
+        }
+    }
+}
+
+#[cfg(target_endian = "big")]
+impl Convert<u16> for Converter {
+    fn convert(&self, value: u16) -> u16 {
+        if self.is_needed {
+            value.to_le()
+        } else {
+            value
+        }
+    }
+}
+
+#[cfg(target_endian = "big")]
+impl Convert<u32> for Converter {
+    fn convert(&self, value: u32) -> u32 {
+        if self.is_needed {
+            value.to_le()
+        } else {
+            value
+        }
+    }
+}
+
+#[cfg(target_endian = "big")]
+impl Convert<u64> for Converter {
+    fn convert(&self, value: u64) -> u64 {
+        if self.is_needed {
+            value.to_le()
+        } else {
+            value
+        }
+    }
+}
+
+#[test]
+fn test_conv() -> () {
+    let conv = Converter { is_needed: true };
+
+    let a = 0x12u8;
+    let a = conv.convert(a);
+    let b = 0x1234u16;
+    let b = conv.convert(b);
+    let c = 0x12345678u32;
+    let c = conv.convert(c);
+    let d = 0x1234567890ABCDEFu64;
+    let d = conv.convert(d);
+
+    assert_eq!(a, 0x12);
+    assert_eq!(b, 0x3412);
+    assert_eq!(c, 0x78563412);
+    assert_eq!(d, 0xEFCDAB9078563412);
+}
+
+#[test]
+fn test_no_conv() -> () {
+    let conv = Converter { is_needed: false };
+
+    let a = 0x12u8;
+    let a = conv.convert(a);
+    let b = 0x1234u16;
+    let b = conv.convert(b);
+    let c = 0x12345678u32;
+    let c = conv.convert(c);
+    let d = 0x1234567890ABCDEFu64;
+    let d = conv.convert(d);
+
+    assert_eq!(a, 0x12);
+    assert_eq!(b, 0x1234);
+    assert_eq!(c, 0x12345678);
+    assert_eq!(d, 0x1234567890ABCDEF);
 }

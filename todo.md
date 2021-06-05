@@ -2,6 +2,7 @@
 
 ## Not yet done
 
+- Load each header field individually. Try to implement a generic function for this
 - Start to use endianness converter
 - Investigate use std::convert::TryInto
 

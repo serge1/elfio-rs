@@ -22,16 +22,18 @@ THE SOFTWARE.
 
 use std::fs::File;
 use std::io;
+use std::io::BufReader;
 
 use elfio::Elfio;
 
 #[test]
 fn header_read_le_32() -> io::Result<()> {
-    let mut elf_file = File::open("tests/files/hello_32")?;
+    let elf_file = File::open("tests/files/hello_32")?;
+    let mut reader = BufReader::new(elf_file);
 
     let mut elf = Elfio::new();
 
-    elf.load(&mut elf_file)?;
+    elf.load(&mut reader)?;
 
     assert_eq!(elf.get_class(), 1);
     assert_eq!(elf.get_elf_version(), 1);
@@ -57,11 +59,12 @@ fn header_read_le_32() -> io::Result<()> {
 
 #[test]
 fn header_read_le_64() -> io::Result<()> {
-    let mut elf_file = File::open("tests/files/hello_64")?;
+    let elf_file = File::open("tests/files/hello_64")?;
+    let mut reader = BufReader::new(elf_file);
 
     let mut elf = Elfio::new();
 
-    elf.load(&mut elf_file)?;
+    elf.load(&mut reader)?;
 
     assert_eq!(elf.get_class(), 2);
     assert_eq!(elf.get_elf_version(), 1);
@@ -87,11 +90,12 @@ fn header_read_le_64() -> io::Result<()> {
 
 #[test]
 fn header_write_read_le_32() -> io::Result<()> {
-    let mut elf_file = File::open("tests/files/hello_32")?;
+    let elf_file = File::open("tests/files/hello_32")?;
+    let mut reader = BufReader::new(elf_file);
 
     let mut elf = Elfio::new();
 
-    elf.load(&mut elf_file)?;
+    elf.load(&mut reader)?;
 
     elf.set_version(1000);
     elf.set_os_abi(83);

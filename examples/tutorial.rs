@@ -22,15 +22,17 @@ THE SOFTWARE.
 
 use std::fs::File;
 use std::io;
+use std::io::BufReader;
 
 use elfio::Elfio;
 
 fn main() -> io::Result<()> {
-    let mut elf_file = File::open("tests/files/hello_64")?;
+    let elf_file = File::open("tests/files/hello_64")?;
+    let mut reader = BufReader::new(elf_file);
 
     let mut elf = Elfio::new();
 
-    elf.load(&mut elf_file)?;
+    elf.load(&mut reader)?;
 
     match elf.get_type() {
         elfio::ET_REL => println!("Object ELF file"),
