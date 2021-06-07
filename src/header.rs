@@ -53,7 +53,7 @@ macro_rules! ELFIO_GET_ACCESS {
     ($type: ident, $name: ident, $field: expr) => {
         paste! {
             fn [<get_ $name>](&self) -> $type {
-                paste! [self. $field].as_()
+                self.converter.convert(paste! [self. $field]).as_()
             }
         }
     };
@@ -63,10 +63,11 @@ macro_rules! ELFIO_GET_SET_ACCESS {
     ($type: ident, $name: ident, $field: expr) => {
         paste! {
             fn [<get_ $name>](&self) -> $type {
-                paste! [self. $field].as_()
+                self.converter.convert(paste! [self. $field]).as_()
             }
             fn [<set_ $name>](&mut self, value: $type) -> () {
                 paste! [self. $field] = (value).as_();
+                paste! [self. $field] = self.converter.convert(paste! [self. $field]);
             }
         }
     };
@@ -93,6 +94,8 @@ pub trait ElfHeaderAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, segments_num);
     ELFIO_GET_SET_ACCESS_DECL!(Elf64Off, segments_offset);
     ELFIO_GET_SET_ACCESS_DECL!(ElfHalf, section_name_str_index);
+
+    fn set_converter(&mut self, converter: &Converter);
 }
 
 // --------------------------------------------------------------------------
@@ -117,16 +120,23 @@ pub struct ElfHeader<Addr, Offset> {
     e_shentsize: ElfHalf,
     e_shnum: ElfHalf,
     e_shstrndx: ElfHalf,
+
+    converter: Converter,
 }
 
 // --------------------------------------------------------------------------
 impl<Addr, Offset> ElfHeader<Addr, Offset>
 where
-    Addr: Zero,
-    Offset: Zero,
+    u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
         ElfHeader::<Addr, Offset> {
+            converter: Converter { is_needed: false },
+
             e_ident: [
                 ELFMAG0,
                 ELFMAG1,
@@ -157,7 +167,7 @@ where
             e_phnum: 0,
             e_shentsize: 0,
             e_shnum: 0,
-            e_shstrndx: 0,
+            e_shstrndx: 0
         }
     }
 }
@@ -165,20 +175,22 @@ where
 // --------------------------------------------------------------------------
 impl<Addr, Offset> ElfHeaderTrait for ElfHeader<Addr, Offset>
 where
-    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
-    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
-    Addr: AsPrimitive<u64> + Load,
-    Offset: AsPrimitive<u64> + Load,
+    u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>
 {
 }
 
 // --------------------------------------------------------------------------
 impl<Addr, Offset> ElfHeaderAccessTrait for ElfHeader<Addr, Offset>
 where
-    u32: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
-    u64: num::cast::AsPrimitive<Addr> + num::cast::AsPrimitive<Offset>,
-    Addr: AsPrimitive<u64>,
-    Offset: AsPrimitive<u64>,
+    u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>
 {
     ELFIO_GET_ACCESS!(u8, class, e_ident[EI_CLASS]);
     ELFIO_GET_ACCESS!(u8, elf_version, e_ident[EI_VERSION]);
@@ -199,6 +211,10 @@ where
     ELFIO_GET_SET_ACCESS!(Elf64Off, sections_offset, e_shoff);
     ELFIO_GET_SET_ACCESS!(ElfHalf, segments_num, e_phnum);
     ELFIO_GET_SET_ACCESS!(Elf64Off, segments_offset, e_phoff);
+
+    fn set_converter(&mut self, converter: &Converter) {
+        self.converter = *converter;
+    }
 }
 
 // --------------------------------------------------------------------------

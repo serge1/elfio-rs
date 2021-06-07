@@ -35,16 +35,16 @@ fn header_read_le_32() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    assert_eq!(elf.get_class(), 1);
+    assert_eq!(elf.get_class(), elfio::ELFCLASS32);
     assert_eq!(elf.get_elf_version(), 1);
-    assert_eq!(elf.get_encoding(), 1);
+    assert_eq!(elf.get_encoding(), elfio::ELFDATA2LSB);
     assert_eq!(elf.get_header_size(), 52);
     assert_eq!(elf.get_section_entry_size(), 40);
     assert_eq!(elf.get_segment_entry_size(), 32);
     assert_eq!(elf.get_version(), 1);
     assert_eq!(elf.get_os_abi(), 0);
     assert_eq!(elf.get_abi_version(), 0);
-    assert_eq!(elf.get_type(), 2);
+    assert_eq!(elf.get_type(), elfio::ET_EXEC);
     assert_eq!(elf.get_machine(), 3);
     assert_eq!(elf.get_flags(), 0);
     assert_eq!(elf.get_entry(), 0x80482b0);
@@ -66,16 +66,16 @@ fn header_read_le_64() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    assert_eq!(elf.get_class(), 2);
+    assert_eq!(elf.get_class(), elfio::ELFCLASS64);
     assert_eq!(elf.get_elf_version(), 1);
-    assert_eq!(elf.get_encoding(), 1);
+    assert_eq!(elf.get_encoding(), elfio::ELFDATA2LSB);
     assert_eq!(elf.get_header_size(), 64);
     assert_eq!(elf.get_section_entry_size(), 64);
     assert_eq!(elf.get_segment_entry_size(), 56);
     assert_eq!(elf.get_version(), 1);
     assert_eq!(elf.get_os_abi(), 0);
     assert_eq!(elf.get_abi_version(), 0);
-    assert_eq!(elf.get_type(), 2);
+    assert_eq!(elf.get_type(), elfio::ET_EXEC);
     assert_eq!(elf.get_machine(), 62);
     assert_eq!(elf.get_flags(), 0);
     assert_eq!(elf.get_entry(), 0x4003c0);
@@ -122,6 +122,68 @@ fn header_write_read_le_32() -> io::Result<()> {
     assert_eq!(elf.get_segments_num(), 10010);
     assert_eq!(elf.get_segments_offset(), 10011);
     assert_eq!(elf.get_section_name_str_index(), 10012);
+
+    Ok(())
+}
+
+#[test]
+fn header_read_be_ppc() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    assert_eq!(elf.get_class(), elfio::ELFCLASS32);
+    assert_eq!(elf.get_elf_version(), 1);
+    assert_eq!(elf.get_encoding(), elfio::ELFDATA2MSB);
+    assert_eq!(elf.get_header_size(), 52);
+    assert_eq!(elf.get_section_entry_size(), 40);
+    assert_eq!(elf.get_segment_entry_size(), 32);
+    assert_eq!(elf.get_version(), 1);
+    assert_eq!(elf.get_os_abi(), 0);
+    assert_eq!(elf.get_abi_version(), 0);
+    assert_eq!(elf.get_type(), elfio::ET_EXEC);
+    assert_eq!(elf.get_machine(), 20);
+    assert_eq!(elf.get_flags(), 0);
+    assert_eq!(elf.get_entry(), 0x10000550);
+    assert_eq!(elf.get_sections_num(), 31);
+    assert_eq!(elf.get_sections_offset(), 3484);
+    assert_eq!(elf.get_segments_num(), 8);
+    assert_eq!(elf.get_segments_offset(), 52);
+    assert_eq!(elf.get_section_name_str_index(), 28);
+
+    Ok(())
+}
+
+#[test]
+fn header_read_be_ppc64() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc64")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    assert_eq!(elf.get_class(), elfio::ELFCLASS64);
+    assert_eq!(elf.get_elf_version(), 1);
+    assert_eq!(elf.get_encoding(), elfio::ELFDATA2MSB);
+    assert_eq!(elf.get_header_size(), 64);
+    assert_eq!(elf.get_section_entry_size(), 64);
+    assert_eq!(elf.get_segment_entry_size(), 56);
+    assert_eq!(elf.get_version(), 1);
+    assert_eq!(elf.get_os_abi(), 0);
+    assert_eq!(elf.get_abi_version(), 0);
+    assert_eq!(elf.get_type(), elfio::ET_DYN);
+    assert_eq!(elf.get_machine(), 21);
+    assert_eq!(elf.get_flags(), 1);
+    assert_eq!(elf.get_entry(), 0x1fa80);
+    assert_eq!(elf.get_sections_num(), 29);
+    assert_eq!(elf.get_sections_offset(), 67384);
+    assert_eq!(elf.get_segments_num(), 8);
+    assert_eq!(elf.get_segments_offset(), 64);
+    assert_eq!(elf.get_section_name_str_index(), 28);
 
     Ok(())
 }

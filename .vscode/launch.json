@@ -7,16 +7,17 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'elfio-rs'",
+            "name": "Debug unit tests in library 'elfio'",
             "cargo": {
                 "args": [
-                    "build",
-                    "--bin=elfio-rs",
-                    "--package=elfio-rs"
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=elfio"
                 ],
                 "filter": {
-                    "name": "elfio-rs",
-                    "kind": "bin"
+                    "name": "elfio",
+                    "kind": "lib"
                 }
             },
             "args": [],
@@ -25,17 +26,54 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'elfio-rs'",
+            "name": "Debug example 'tutorial'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=tutorial",
+                    "--package=elfio"
+                ],
+                "filter": {
+                    "name": "tutorial",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'tutorial'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=elfio-rs",
-                    "--package=elfio-rs"
+                    "--example=tutorial",
+                    "--package=elfio"
                 ],
                 "filter": {
-                    "name": "elfio-rs",
-                    "kind": "bin"
+                    "name": "tutorial",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'test1'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=test1",
+                    "--package=elfio"
+                ],
+                "filter": {
+                    "name": "test1",
+                    "kind": "test"
                 }
             },
             "args": [],

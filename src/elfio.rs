@@ -23,7 +23,7 @@ THE SOFTWARE.
 #![warn(missing_docs)]
 //! 'elfio' is a Rust library intended for reading and generating
 //! files in the ELF binary format. The library supports processing
-//! of ELF files for 32- and 64-bit architectures regardless of the
+//! of ELF for 32- and 64-bit architectures regardless of their
 //! endianess
 
 mod header;
@@ -107,8 +107,8 @@ impl Elfio {
     /// Create a new instance
     pub fn new() -> Elfio {
         Elfio {
-            header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
             converter: utils::Converter { is_needed: false },
+            header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
         }
     }
 
@@ -156,13 +156,14 @@ impl Elfio {
             Err(e) => return Err(e),
         }
 
-        if !((cfg!(target_endian = "little") && (self.header.get_encoding() != ELFDATA2LSB))
-            || (cfg!(target_endian = "big") && (self.header.get_encoding() != ELFDATA2MSB)))
+        if (cfg!(target_endian = "little") && (self.header.get_encoding() == ELFDATA2LSB))
+            || (cfg!(target_endian = "big") && (self.header.get_encoding() == ELFDATA2MSB))
         {
             self.converter.is_needed = false;
         } else {
             self.converter.is_needed = true;
         }
+        self.header.set_converter(&self.converter);
 
         Ok(())
     }
