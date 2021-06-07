@@ -20,18 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#![warn(missing_docs)]
+//#![warn(missing_docs)]
+
 //! 'elfio' is a Rust library intended for reading and generating
 //! files in the ELF binary format. The library supports processing
 //! of ELF files for 32- and 64-bit architectures regardless of their
 //! endianess
-//! 
+//!
 //! For example:
 //! ```
 //! use std::fs::File;
 //! use std::io;
 //! use std::io::BufReader;
-//! 
+//!
 //! // use elfio::Elfio;  // Uncomment in the real code
 //!
 //! fn main() -> io::Result<()> {
@@ -54,45 +55,19 @@ THE SOFTWARE.
 //! }
 //! ```
 
-
 mod header;
+#[macro_use] 
+mod macros;
+mod section;
 mod types;
 mod utils;
 
 use header::*;
-use paste::paste;
+//use section::*;
 use std::fs::File;
 use std::io;
 use std::io::{prelude::*, BufReader};
 pub use types::*;
-
-// --------------------------------------------------------------------------
-macro_rules! ELFIO_HEADER_ACCESS_GET {
-    ($type: ident, $name: ident) => {
-        paste! {
-            /// Read access to the corresponding ELF header field
-            pub fn [<get_ $name>](&self) -> $type {
-                self.header.[<get_ $name>]()
-            }
-        }
-    };
-}
-
-macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
-    ($type: ident, $name: ident) => {
-        paste! {
-            /// Read access to the corresponding ELF header field
-            pub fn [<get_ $name>](&self) -> $type {
-                self.header.[<get_ $name>]()
-            }
-
-            /// Write access to the corresponding ELF header field
-            pub fn [<set_ $name>](&mut self, value: $type) -> () {
-                self.header.[<set_ $name>](value);
-            }
-        }
-    };
-}
 
 /// Elfio - the main struct of the library. All access to ELF files attributes
 /// starts from this object.

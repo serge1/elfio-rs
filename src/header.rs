@@ -22,56 +22,11 @@ THE SOFTWARE.
 
 extern crate num;
 
-use super::types::*;
 use super::utils::*;
-use num::cast::AsPrimitive;
-use num::Zero;
-use paste::paste;
+use super::*;
+use num::{cast::AsPrimitive, Zero};
 use std::fs::File;
-use std::io;
 use std::io::BufReader;
-
-// --------------------------------------------------------------------------
-macro_rules! ELFIO_GET_ACCESS_DECL {
-    ($type: ident, $name: ident) => {
-        paste! {
-            fn [<get_ $name>](&self) -> $type;
-        }
-    };
-}
-
-macro_rules! ELFIO_GET_SET_ACCESS_DECL {
-    ($type: ident, $name: ident) => {
-        paste! {
-            fn [<get_ $name>](&self) -> $type;
-            fn [<set_ $name>](&mut self, value: $type) -> ();
-        }
-    };
-}
-
-macro_rules! ELFIO_GET_ACCESS {
-    ($type: ident, $name: ident, $field: expr) => {
-        paste! {
-            fn [<get_ $name>](&self) -> $type {
-                self.converter.convert(paste! [self. $field]).as_()
-            }
-        }
-    };
-}
-
-macro_rules! ELFIO_GET_SET_ACCESS {
-    ($type: ident, $name: ident, $field: expr) => {
-        paste! {
-            fn [<get_ $name>](&self) -> $type {
-                self.converter.convert(paste! [self. $field]).as_()
-            }
-            fn [<set_ $name>](&mut self, value: $type) -> () {
-                paste! [self. $field] = (value).as_();
-                paste! [self. $field] = self.converter.convert(paste! [self. $field]);
-            }
-        }
-    };
-}
 
 // --------------------------------------------------------------------------
 pub trait ElfHeaderAccessTrait {
@@ -131,7 +86,7 @@ where
     u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
     Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Converter: Convert<Addr> + Convert<Offset>
+    Converter: Convert<Addr> + Convert<Offset>,
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
         ElfHeader::<Addr, Offset> {
@@ -167,7 +122,7 @@ where
             e_phnum: 0,
             e_shentsize: 0,
             e_shnum: 0,
-            e_shstrndx: 0
+            e_shstrndx: 0,
         }
     }
 }
@@ -179,7 +134,7 @@ where
     u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
     Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Converter: Convert<Addr> + Convert<Offset>
+    Converter: Convert<Addr> + Convert<Offset>,
 {
 }
 
@@ -190,7 +145,7 @@ where
     u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
     Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Converter: Convert<Addr> + Convert<Offset>
+    Converter: Convert<Addr> + Convert<Offset>,
 {
     ELFIO_GET_ACCESS!(u8, class, e_ident[EI_CLASS]);
     ELFIO_GET_ACCESS!(u8, elf_version, e_ident[EI_VERSION]);

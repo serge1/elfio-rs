@@ -2,8 +2,7 @@
 
 ## Not yet done
 
-- Start to use endianness converter
-- Investigate use std::convert::TryInto
+- Implement Section Trait and Struct
 
 ## Done
 
@@ -18,3 +17,5 @@
 - Try to move 'load' function to a separate trait
   The default implementation cannot be done - it requires type Size
 - Learn and add documentation
+- Start to use endianness converter
+- Investigate use std::convert::TryInto
