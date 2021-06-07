@@ -23,8 +23,37 @@ THE SOFTWARE.
 #![warn(missing_docs)]
 //! 'elfio' is a Rust library intended for reading and generating
 //! files in the ELF binary format. The library supports processing
-//! of ELF for 32- and 64-bit architectures regardless of their
+//! of ELF files for 32- and 64-bit architectures regardless of their
 //! endianess
+//! 
+//! For example:
+//! ```
+//! use std::fs::File;
+//! use std::io;
+//! use std::io::BufReader;
+//! 
+//! // use elfio::Elfio;  // Uncomment in the real code
+//!
+//! fn main() -> io::Result<()> {
+//!     let elf_file = File::open("tests/files/hello_64")?;
+//!     let mut file_reader = BufReader::new(elf_file);
+//!
+//!     let mut reader = elfio::Elfio::new();
+//!
+//!     reader.load(&mut file_reader)?;
+//!
+//!     match reader.get_type() {
+//!         elfio::ET_REL => println!("Object ELF file"),
+//!         elfio::ET_EXEC => println!("Executable ELF file"),
+//!         elfio::ET_DYN => println!("Shared library ELF file"),
+//!         elfio::ET_CORE => println!("Core ELF file"),
+//!         _ => println!("ELF type is not recognized"),
+//!     }
+//!
+//!     Ok(())
+//! }
+//! ```
+
 
 mod header;
 mod types;
@@ -66,35 +95,9 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 }
 
 /// Elfio - the main struct of the library. All access to ELF files attributes
-/// is done through this object
-///
-/// For example:
-/// ```
-/// use std::fs::File;
-/// use std::io;
-/// use std::io::BufReader;
-///
-/// //use elfio;     // It needs to be uncommented in the real code
-///
-/// fn main() -> io::Result<()> {
-///     let elf_file = File::open("tests/files/hello_64")?;
-///     let mut file_reader = BufReader::new(elf_file);
-///
-///     let mut reader = elfio::Elfio::new();
-///
-///     reader.load(&mut file_reader)?;
-///
-///     match reader.get_type() {
-///         elfio::ET_REL => println!("Object ELF file"),
-///         elfio::ET_EXEC => println!("Executable ELF file"),
-///         elfio::ET_DYN => println!("Shared library ELF file"),
-///         elfio::ET_CORE => println!("Core ELF file"),
-///         _ => println!("ELF type is not recognized"),
-///     }
-///
-///     Ok(())
-/// }
-/// ```
+/// starts from this object.
+/// The object provides functions to access ELF file header attributes as well
+/// as the list of segments and sections of this file.
 
 // --------------------------------------------------------------------------
 pub struct Elfio {
