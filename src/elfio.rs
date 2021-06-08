@@ -55,9 +55,10 @@ THE SOFTWARE.
 //! }
 //! ```
 
-mod header;
-#[macro_use] 
+#[macro_use]
 mod macros;
+
+mod header;
 mod section;
 mod types;
 mod utils;

@@ -27,7 +27,6 @@ macro_rules! ELFIO_HEADER_ACCESS_GET_SET {
 }
 
 // --------------------------------------------------------------------------
-#[macro_export]
 macro_rules! ELFIO_GET_ACCESS_DECL {
     ($type: ident, $name: ident) => {
         paste::paste! {
@@ -36,7 +35,6 @@ macro_rules! ELFIO_GET_ACCESS_DECL {
     };
 }
 
-#[macro_export]
 macro_rules! ELFIO_GET_SET_ACCESS_DECL {
     ($type: ident, $name: ident) => {
         paste::paste! {
@@ -46,7 +44,6 @@ macro_rules! ELFIO_GET_SET_ACCESS_DECL {
     };
 }
 
-#[macro_export]
 macro_rules! ELFIO_GET_ACCESS {
     ($type: ident, $name: ident, $field: expr) => {
         paste::paste! {
@@ -57,7 +54,6 @@ macro_rules! ELFIO_GET_ACCESS {
     };
 }
 
-#[macro_export]
 macro_rules! ELFIO_GET_SET_ACCESS {
     ($type: ident, $name: ident, $field: expr) => {
         paste::paste! {
