@@ -22,6 +22,7 @@ THE SOFTWARE.
 
 use super::utils::*;
 use super::*;
+use num::{cast::AsPrimitive, Zero};
 
 // --------------------------------------------------------------------------
 pub trait ElfSectionAccessTrait {
@@ -60,4 +61,108 @@ pub struct ElfSection<Addr, Offset> {
     sh_entsize: ElfWord,
 
     converter: Converter,
+}
+
+// --------------------------------------------------------------------------
+impl<Addr, Offset> ElfSection<Addr, Offset>
+where
+    u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>,
+{
+    pub fn new() -> ElfSection<Addr, Offset> {
+        ElfSection::<Addr, Offset> {
+            converter: Converter { is_needed: false },
+
+            sh_name: "".to_string(),
+            sh_type: 0,
+            sh_flags: 0,
+            sh_addr: Addr::zero(),
+            sh_offset: Offset::zero(),
+            sh_size: 0,
+            sh_link: 0,
+            sh_info: 0,
+            sh_addralign: 0,
+            sh_entsize: 0,
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+impl<Addr, Offset> ElfSectionTrait for ElfSection<Addr, Offset>
+where
+    u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>,
+{
+}
+
+// --------------------------------------------------------------------------
+impl<Addr, Offset> ElfSectionAccessTrait for ElfSection<Addr, Offset>
+where
+    u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>,
+{
+    ELFIO_GET_SET_ACCESS!(ElfWord, type, sh_type);
+    ELFIO_GET_SET_ACCESS!(ElfXword, flags, sh_flags);
+    ELFIO_GET_SET_ACCESS!(ElfWord, info, sh_info);
+    ELFIO_GET_SET_ACCESS!(ElfWord, link, sh_link);
+    ELFIO_GET_SET_ACCESS!(ElfXword, addr_align, sh_addralign);
+    ELFIO_GET_SET_ACCESS!(ElfXword, entry_size, sh_entsize);
+    ELFIO_GET_SET_ACCESS!(Elf64Addr, address, sh_addr);
+    ELFIO_GET_SET_ACCESS!(ElfXword, size, sh_size);
+    ELFIO_GET_SET_ACCESS!(ElfWord, name_string_offset, sh_addr);
+    ELFIO_GET_SET_ACCESS!(Elf64Off, offset, sh_offset);
+
+    fn get_name(&self) -> std::string::String {
+        todo!()
+    }
+    fn set_name(&mut self, _: std::string::String) {
+        todo!()
+    }
+
+    fn set_converter(&mut self, converter: &Converter) {
+        self.converter = *converter;
+    }
+}
+
+// --------------------------------------------------------------------------
+impl<Addr, Offset> Load for ElfSection<Addr, Offset>
+where
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>,
+{
+    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        self.sh_type.load(reader)?;
+        self.sh_flags.load(reader)?;
+        self.sh_info.load(reader)?;
+        self.sh_link.load(reader)?;
+        self.sh_addralign.load(reader)?;
+        self.sh_entsize.load(reader)?;
+        self.sh_addr.load(reader)?;
+        self.sh_size.load(reader)?;
+        self.sh_addr.load(reader)?;
+        self.sh_offset.load(reader)?;
+
+        self.sh_type = self.converter.convert(self.sh_type);
+        self.sh_flags = self.converter.convert(self.sh_flags);
+        self.sh_info = self.converter.convert(self.sh_info);
+        self.sh_link = self.converter.convert(self.sh_link);
+        self.sh_addralign = self.converter.convert(self.sh_addralign);
+        self.sh_entsize = self.converter.convert(self.sh_entsize);
+        self.sh_addr = self.converter.convert(self.sh_addr);
+        self.sh_size = self.converter.convert(self.sh_size);
+        self.sh_addr = self.converter.convert(self.sh_addr);
+        self.sh_offset = self.converter.convert(self.sh_offset);
+
+        Ok(())
+    }
 }
