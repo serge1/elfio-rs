@@ -129,19 +129,19 @@ impl Elfio {
             self.header = Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new());
         }
 
-        match self.header.load(reader) {
-            Ok(_) => (),
-            Err(e) => return Err(e),
-        }
-
-        if (cfg!(target_endian = "little") && (self.header.get_encoding() == ELFDATA2LSB))
-            || (cfg!(target_endian = "big") && (self.header.get_encoding() == ELFDATA2MSB))
+        if (cfg!(target_endian = "little") && (e_ident[EI_DATA] == ELFDATA2LSB))
+            || (cfg!(target_endian = "big") && (e_ident[EI_DATA] == ELFDATA2MSB))
         {
             self.converter.is_needed = false;
         } else {
             self.converter.is_needed = true;
         }
         self.header.set_converter(&self.converter);
+
+        match self.header.load(reader) {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        }
 
         Ok(())
     }

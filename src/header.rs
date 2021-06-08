@@ -175,8 +175,9 @@ where
 // --------------------------------------------------------------------------
 impl<Addr, Offset> Load for ElfHeader<Addr, Offset>
 where
-    Addr: Load,
-    Offset: Load,
+    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Converter: Convert<Addr> + Convert<Offset>,
 {
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
         (&mut self.e_ident).load(reader)?;
@@ -193,6 +194,20 @@ where
         self.e_shentsize.load(reader)?;
         self.e_shnum.load(reader)?;
         self.e_shstrndx.load(reader)?;
+
+        self.e_type = self.converter.convert(self.e_type);
+        self.e_machine = self.converter.convert(self.e_machine);
+        self.e_version = self.converter.convert(self.e_version);
+        self.e_entry = self.converter.convert(self.e_entry);
+        self.e_phoff = self.converter.convert(self.e_phoff);
+        self.e_shoff = self.converter.convert(self.e_shoff);
+        self.e_flags = self.converter.convert(self.e_flags);
+        self.e_ehsize = self.converter.convert(self.e_ehsize);
+        self.e_phentsize = self.converter.convert(self.e_phentsize);
+        self.e_phnum = self.converter.convert(self.e_phnum);
+        self.e_shentsize = self.converter.convert(self.e_shentsize);
+        self.e_shnum = self.converter.convert(self.e_shnum);
+        self.e_shstrndx = self.converter.convert(self.e_shstrndx);
 
         Ok(())
     }

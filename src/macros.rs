@@ -41,7 +41,7 @@ macro_rules! ELFIO_GET_SET_ACCESS_DECL {
     ($type: ident, $name: ident) => {
         paste::paste! {
             fn [<get_ $name>](&self) -> $type;
-            fn [<set_ $name>](&mut self, value: $type) -> ();
+            fn [<set_ $name>](&mut self, value: $type);
         }
     };
 }
@@ -51,7 +51,7 @@ macro_rules! ELFIO_GET_ACCESS {
     ($type: ident, $name: ident, $field: expr) => {
         paste::paste! {
             fn [<get_ $name>](&self) -> $type {
-                self.converter.convert(paste::paste! [self. $field]).as_()
+                paste::paste! [self. $field].as_()
             }
         }
     };
@@ -62,11 +62,10 @@ macro_rules! ELFIO_GET_SET_ACCESS {
     ($type: ident, $name: ident, $field: expr) => {
         paste::paste! {
             fn [<get_ $name>](&self) -> $type {
-                self.converter.convert(paste::paste! [self. $field]).as_()
+                paste::paste! [self. $field].as_()
             }
-            fn [<set_ $name>](&mut self, value: $type) -> () {
+            fn [<set_ $name>](&mut self, value: $type) {
                 paste::paste! [self. $field] = (value).as_();
-                paste::paste! [self. $field] = self.converter.convert(paste::paste! [self. $field]);
             }
         }
     };

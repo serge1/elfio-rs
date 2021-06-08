@@ -23,6 +23,7 @@ THE SOFTWARE.
 use super::utils::*;
 use super::*;
 
+// --------------------------------------------------------------------------
 pub trait ElfSectionAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(String, name);
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, type);
@@ -37,4 +38,26 @@ pub trait ElfSectionAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(Elf64Off, offset);
 
     fn set_converter(&mut self, converter: &Converter);
+}
+
+// --------------------------------------------------------------------------
+pub trait ElfSectionTrait: ElfSectionAccessTrait + Load {}
+
+// --------------------------------------------------------------------------
+// ELF file header
+#[repr(C)]
+#[derive(Debug)]
+pub struct ElfSection<Addr, Offset> {
+    sh_name: String,
+    sh_type: ElfWord,
+    sh_flags: ElfWord,
+    sh_addr: Addr,
+    sh_offset: Offset,
+    sh_size: ElfWord,
+    sh_link: ElfWord,
+    sh_info: ElfWord,
+    sh_addralign: ElfWord,
+    sh_entsize: ElfWord,
+
+    converter: Converter,
 }
