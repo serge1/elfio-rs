@@ -76,6 +76,7 @@ mod macros;
 
 mod header;
 mod section;
+mod segment;
 mod types;
 mod utils;
 
