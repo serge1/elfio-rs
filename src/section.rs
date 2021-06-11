@@ -156,17 +156,6 @@ where
         self.sh_addralign.load(reader)?;
         self.sh_entsize.load(reader)?;
 
-        self.sh_name = self.converter.convert(self.sh_name);
-        self.sh_type = self.converter.convert(self.sh_type);
-        self.sh_flags = self.converter.convert(self.sh_flags);
-        self.sh_addr = self.converter.convert(self.sh_addr);
-        self.sh_offset = self.converter.convert(self.sh_offset);
-        self.sh_size = self.converter.convert(self.sh_size);
-        self.sh_link = self.converter.convert(self.sh_link);
-        self.sh_info = self.converter.convert(self.sh_info);
-        self.sh_addralign = self.converter.convert(self.sh_addralign);
-        self.sh_entsize = self.converter.convert(self.sh_entsize);
-
         Ok(())
     }
 }

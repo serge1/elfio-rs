@@ -27,7 +27,7 @@ use std::io::BufReader;
 use elfio::Elfio;
 
 #[test]
-fn_read_le_32() -> io::Result<()> {
+fn read_le_32() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_32")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -93,7 +93,7 @@ fn_read_le_32() -> io::Result<()> {
 }
 
 #[test]
-fn_read_le_64() -> io::Result<()> {
+fn read_le_64() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_64")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -148,7 +148,7 @@ fn_read_le_64() -> io::Result<()> {
 }
 
 #[test]
-fn_write_read_le_32() -> io::Result<()> {
+fn write_read_le_32() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_32")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -186,7 +186,7 @@ fn_write_read_le_32() -> io::Result<()> {
 }
 
 #[test]
-fn_read_be_ppc() -> io::Result<()> {
+fn read_be_ppc() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_ppc")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -217,7 +217,7 @@ fn_read_be_ppc() -> io::Result<()> {
 }
 
 #[test]
-fn_read_be_ppc64() -> io::Result<()> {
+fn read_be_ppc64() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_ppc64")?;
     let mut reader = BufReader::new(elf_file);
 
