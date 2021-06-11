@@ -20,6 +20,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/*
+   Copyright 2021 Serge Lamikhov-Center
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 //#![warn(missing_docs)]
 
 //! 'elfio' is a Rust library intended for reading and generating
@@ -64,7 +80,7 @@ mod types;
 mod utils;
 
 use header::*;
-//use section::*;
+use section::*;
 use std::fs::File;
 use std::io;
 use std::io::{prelude::*, BufReader};
@@ -79,6 +95,7 @@ pub use types::*;
 pub struct Elfio {
     header: Box<dyn ElfHeaderTrait>,
     converter: utils::Converter,
+    sections: Vec<Box<dyn ElfSectionTrait>>,
 }
 
 // --------------------------------------------------------------------------
@@ -88,10 +105,11 @@ impl Elfio {
         Elfio {
             converter: utils::Converter { is_needed: false },
             header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
+            sections: Vec::new(),
         }
     }
 
-    /// Load the structure from input stream
+    /// Load the ELF file from input stream
     pub fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
         let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
         // Read ELF file signature
@@ -142,9 +160,49 @@ impl Elfio {
         match self.header.load(reader) {
             Ok(_) => (),
             Err(e) => return Err(e),
+        };
+
+        self.load_sections(reader)?;
+
+        Ok(())
+    }
+
+    /// Retrieve all ELF file sections
+    pub fn get_sections(&self) -> &Vec<Box<dyn ElfSectionTrait>> {
+        return &self.sections;
+    }
+
+    /// Retrieve ELF file section by its name
+    pub fn get_section_by_name(&self) -> &Box<dyn ElfSectionTrait> {
+        todo!()
+    }
+
+    fn load_sections(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        let entry_size = self.header.get_section_entry_size() as Elf64Off;
+        let num = self.header.get_sections_num() as Elf64Off;
+        let offset = self.header.get_sections_offset();
+
+        for i in 0..num {
+            let section = self.create_section();
+            reader.seek(io::SeekFrom::Start(i * entry_size + offset))?;
+            section.load(reader)?;
         }
 
         Ok(())
+    }
+
+    fn create_section(&mut self) -> &mut Box<dyn ElfSectionTrait> {
+        let mut section: Box<dyn ElfSectionTrait> = if self.header.get_class() == ELFCLASS32 {
+            Box::new(ElfSection::<Elf32Addr, Elf32Off, ElfWord>::new())
+        } else {
+            Box::new(ElfSection::<Elf64Addr, Elf64Off, ElfXword>::new())
+        };
+
+        section.set_converter(&self.converter);
+        self.sections.push(section);
+
+        let index = self.sections.len() - 1;
+        return self.sections.get_mut(index).unwrap();
     }
 
     ELFIO_HEADER_ACCESS_GET!(u8, class);

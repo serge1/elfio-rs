@@ -27,7 +27,7 @@ use std::io::BufReader;
 use elfio::Elfio;
 
 #[test]
-fn header_read_le_32() -> io::Result<()> {
+fn_read_le_32() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_32")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -54,11 +54,46 @@ fn header_read_le_32() -> io::Result<()> {
     assert_eq!(elf.get_segments_offset(), 52);
     assert_eq!(elf.get_section_name_str_index(), 25);
 
+    let sections = elf.get_sections();
+
+    let section = sections.get(0).unwrap();
+    assert_eq!(section.get_type(), 0);
+    assert_eq!(section.get_flags(), 0);
+    assert_eq!(section.get_info(), 0);
+    assert_eq!(section.get_link(), 0);
+    assert_eq!(section.get_addr_align(), 0);
+    assert_eq!(section.get_entry_size(), 0);
+    assert_eq!(section.get_address(), 0);
+    assert_eq!(section.get_size(), 0);
+    assert_eq!(section.get_offset(), 0);
+
+    let section = sections.get(12).unwrap();
+    assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
+    assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_EXECINSTR);
+    assert_eq!(section.get_info(), 0);
+    assert_eq!(section.get_link(), 0);
+    assert_eq!(section.get_addr_align(), 16);
+    assert_eq!(section.get_entry_size(), 0);
+    assert_eq!(section.get_address(), 0x080482b0);
+    assert_eq!(section.get_size(), 0x1a8);
+    assert_eq!(section.get_offset(), 0x2b0);
+
+    let section = sections.get(19).unwrap();
+    assert_eq!(section.get_type(), elfio::SHT_DYNAMIC);
+    assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_WRITE);
+    assert_eq!(section.get_info(), 0);
+    assert_eq!(section.get_link(), 5);
+    assert_eq!(section.get_addr_align(), 4);
+    assert_eq!(section.get_entry_size(), 8);
+    assert_eq!(section.get_address(), 0x080494a0);
+    assert_eq!(section.get_size(), 0xc8);
+    assert_eq!(section.get_offset(), 0x4a0);
+
     Ok(())
 }
 
 #[test]
-fn header_read_le_64() -> io::Result<()> {
+fn_read_le_64() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_64")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -85,11 +120,35 @@ fn header_read_le_64() -> io::Result<()> {
     assert_eq!(elf.get_segments_offset(), 64);
     assert_eq!(elf.get_section_name_str_index(), 26);
 
+    let sections = elf.get_sections();
+
+    let section = sections.get(0).unwrap();
+    assert_eq!(section.get_type(), 0);
+    assert_eq!(section.get_flags(), 0);
+    assert_eq!(section.get_info(), 0);
+    assert_eq!(section.get_link(), 0);
+    assert_eq!(section.get_addr_align(), 0);
+    assert_eq!(section.get_entry_size(), 0);
+    assert_eq!(section.get_address(), 0);
+    assert_eq!(section.get_size(), 0);
+    assert_eq!(section.get_offset(), 0);
+
+    let section = sections.get(1).unwrap();
+    assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
+    assert_eq!(section.get_flags(), elfio::SHF_ALLOC);
+    assert_eq!(section.get_info(), 0);
+    assert_eq!(section.get_link(), 0);
+    assert_eq!(section.get_addr_align(), 1);
+    assert_eq!(section.get_entry_size(), 0);
+    assert_eq!(section.get_address(), 0x400200);
+    assert_eq!(section.get_size(), 0x1c);
+    assert_eq!(section.get_offset(), 0x200);
+
     Ok(())
 }
 
 #[test]
-fn header_write_read_le_32() -> io::Result<()> {
+fn_write_read_le_32() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_32")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -127,7 +186,7 @@ fn header_write_read_le_32() -> io::Result<()> {
 }
 
 #[test]
-fn header_read_be_ppc() -> io::Result<()> {
+fn_read_be_ppc() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_ppc")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -158,7 +217,7 @@ fn header_read_be_ppc() -> io::Result<()> {
 }
 
 #[test]
-fn header_read_be_ppc64() -> io::Result<()> {
+fn_read_be_ppc64() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_ppc64")?;
     let mut reader = BufReader::new(elf_file);
 
@@ -184,6 +243,29 @@ fn header_read_be_ppc64() -> io::Result<()> {
     assert_eq!(elf.get_segments_num(), 8);
     assert_eq!(elf.get_segments_offset(), 64);
     assert_eq!(elf.get_section_name_str_index(), 28);
+
+    let sections = elf.get_sections();
+    let section = sections.get(0).unwrap();
+    assert_eq!(section.get_type(), 0);
+    assert_eq!(section.get_flags(), 0);
+    assert_eq!(section.get_info(), 0);
+    assert_eq!(section.get_link(), 0);
+    assert_eq!(section.get_addr_align(), 0);
+    assert_eq!(section.get_entry_size(), 0);
+    assert_eq!(section.get_address(), 0);
+    assert_eq!(section.get_size(), 0);
+    assert_eq!(section.get_offset(), 0);
+
+    let section = sections.get(24).unwrap();
+    assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
+    assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_WRITE);
+    assert_eq!(section.get_info(), 0);
+    assert_eq!(section.get_link(), 0);
+    assert_eq!(section.get_addr_align(), 8);
+    assert_eq!(section.get_entry_size(), 0);
+    assert_eq!(section.get_address(), 0x20000);
+    assert_eq!(section.get_size(), 0x5a4);
+    assert_eq!(section.get_offset(), 0x10000);
 
     Ok(())
 }

@@ -107,3 +107,93 @@ pub const ET_EXEC: ElfHalf = 2;
 pub const ET_DYN: ElfHalf = 3;
 /// Core file
 pub const ET_CORE: ElfHalf = 4;
+
+// Section indexes
+/// This value marks an undefined, missing, irrelevant, or otherwise
+/// meaningless section reference.
+pub const SHN_UNDEF: ElfHalf = 0;
+/// This value specifies the lower bound of the range of reserved indexes
+pub const SHN_LORESERVE: ElfHalf = 0xFF00;
+/// Values in this inclusive range are reserved for processor-specific semantics
+pub const SHN_LOPROC: ElfHalf = 0xFF00;
+/// Values in this inclusive range are reserved for processor-specific semantics
+pub const SHN_HIPROC: ElfHalf = 0xFF1F;
+pub const SHN_LOOS: ElfHalf = 0xFF20;
+pub const SHN_HIOS: ElfHalf = 0xFF3F;
+/// This value specifies absolute values for the corresponding reference
+pub const SHN_ABS: ElfHalf = 0xFFF1;
+/// Symbols defined relative to this section are common symbols
+pub const SHN_COMMON: ElfHalf = 0xFFF2;
+pub const SHN_XINDEX: ElfHalf = 0xFFFF;
+/// This value specifies the upper bound of the range of reserved indexes.
+pub const SHN_HIRESERVE: ElfHalf = 0xFFFF;
+
+// Section types
+/// This value marks the section header as inactive; it does not have an
+/// associated section
+pub const SHT_NULL: ElfWord = 0;
+/// The section holds information defined by the program, whose format and
+/// meaning are determined solely by the program
+pub const SHT_PROGBITS: ElfWord = 1;
+/// These sections hold a symbol table
+pub const SHT_SYMTAB: ElfWord = 2;
+/// The section holds a string table
+pub const SHT_STRTAB: ElfWord = 3;
+/// The section holds relocation entries with explicit addends
+pub const SHT_RELA: ElfWord = 4;
+/// The section holds a symbol hash table
+pub const SHT_HASH: ElfWord = 5;
+/// The section holds information for dynamic linking
+pub const SHT_DYNAMIC: ElfWord = 6;
+/// This section holds information that marks the file in some way
+pub const SHT_NOTE: ElfWord = 7;
+/// A section of this type occupies no space in the file but otherwise resembles
+/// SHT_PROGBITS
+pub const SHT_NOBITS: ElfWord = 8;
+/// The section holds relocation entries without explicit addends
+pub const SHT_REL: ElfWord = 9;
+/// This section type is reserved but has unspecified semantics
+pub const SHT_SHLIB: ElfWord = 10;
+/// These sections hold a symbol table.
+pub const SHT_DYNSYM: ElfWord = 11;
+pub const SHT_INIT_ARRAY: ElfWord = 14;
+pub const SHT_FINI_ARRAY: ElfWord = 15;
+pub const SHT_PREINIT_ARRAY: ElfWord = 16;
+pub const SHT_GROUP: ElfWord = 17;
+pub const SHT_SYMTAB_SHNDX: ElfWord = 18;
+pub const SHT_LOOS: ElfWord = 0x60000000;
+pub const SHT_HIOS: ElfWord = 0x6fffffff;
+/// Values in this inclusive range are reserved for processor-specific semantics
+pub const SHT_LOPROC: ElfWord = 0x70000000;
+/// Values in this inclusive range are reserved for processor-specific semantics
+pub const SHT_HIPROC: ElfWord = 0x7FFFFFFF;
+/// This value specifies the lower bound of the range of indexes reserved for
+/// application programs
+pub const SHT_LOUSER: ElfWord = 0x80000000;
+/// This value specifies the upper bound of the range of indexes reserved for
+/// application programs
+pub const SHT_HIUSER: ElfWord = 0xFFFFFFFF;
+
+// Section attribute flags
+/// The section contains data that should be writable during process execution
+pub const SHF_WRITE: ElfXword = 0x1;
+/// The section occupies memory during process execution
+pub const SHF_ALLOC: ElfXword = 0x2;
+/// The section contains executable machine instructions
+pub const SHF_EXECINSTR: ElfXword = 0x4;
+///
+pub const SHF_MERGE: ElfXword = 0x10;
+pub const SHF_STRINGS: ElfXword = 0x20;
+pub const SHF_INFO_LINK: ElfXword = 0x40;
+pub const SHF_LINK_ORDER: ElfXword = 0x80;
+pub const SHF_OS_NONCONFORMING: ElfXword = 0x100;
+pub const SHF_GROUP: ElfXword = 0x200;
+pub const SHF_TLS: ElfXword = 0x400;
+pub const SHF_MASKOS: ElfXword = 0x0ff00000;
+/// All bits included in this mask are reserved for processor-specific semantics
+pub const SHF_MASKPROC: ElfXword = 0xF0000000;
+
+// Section group flags
+// pub const GRP_COMDAT   0x1
+// pub const GRP_MASKOS   0x0ff00000
+// pub const GRP_MASKPROC 0xf0000000

@@ -2,7 +2,8 @@
 
 ## Not yet done
 
-- Implement Section Trait and Struct
+- Implement Segment Trait and Struct
+- Decide regarding template args. Maybe a single param is enough
 
 ## Done
 
@@ -19,3 +20,4 @@
 - Learn and add documentation
 - Start to use endianness converter
 - Investigate use std::convert::TryInto
+- Implement Section Trait and Struct
