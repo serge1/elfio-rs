@@ -34,8 +34,6 @@ pub trait ElfSegmentAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, file_size);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, memory_size);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, align);
-
-    fn set_converter(&mut self, converter: &Converter);
 }
 
 // --------------------------------------------------------------------------
@@ -68,9 +66,9 @@ where
     Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
-    pub fn new() -> ElfSegment<Addr, Offset, Word> {
+    pub fn new(conv: &Converter) -> ElfSegment<Addr, Offset, Word> {
         ElfSegment::<Addr, Offset, Word> {
-            converter: Converter { is_needed: false },
+            converter: *conv,
 
             p_type: 0,
             p_flags: 0,
@@ -114,32 +112,7 @@ where
     ELFIO_GET_SET_ACCESS!(ElfXword, file_size, p_filesz);
     ELFIO_GET_SET_ACCESS!(ElfXword, memory_size, p_memsz);
     ELFIO_GET_SET_ACCESS!(ElfXword, align, p_align);
-
-    fn set_converter(&mut self, converter: &Converter) {
-        self.converter = *converter;
-    }
 }
-
-// --------------------------------------------------------------------------
-// impl Load for ElfSegment<Elf64Addr, Elf64Off, ElfXword>
-// where
-//     Elf64Addr: Zero + Load + AsPrimitive<u64>,
-//     Elf64Off: Zero + Load + AsPrimitive<u64>,
-//     ElfXword: Zero + Load + AsPrimitive<u64>,
-// {
-//     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
-//         self.p_type.load(reader)?;
-//         self.p_flags.load(reader)?;
-//         self.p_offset.load(reader)?;
-//         self.p_vaddr.load(reader)?;
-//         self.p_paddr.load(reader)?;
-//         self.p_filesz.load(reader)?;
-//         self.p_memsz.load(reader)?;
-//         self.p_align.load(reader)?;
-
-//         Ok(())
-//     }
-// }
 
 // --------------------------------------------------------------------------
 impl<Addr, Offset, Word> Load for ElfSegment<Addr, Offset, Word>

@@ -37,8 +37,6 @@ pub trait ElfSectionAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, info);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, addr_align);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, entry_size);
-
-    fn set_converter(&mut self, converter: &Converter);
 }
 
 // --------------------------------------------------------------------------
@@ -73,9 +71,9 @@ where
     Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
-    pub fn new() -> ElfSection<Addr, Offset, Word> {
+    pub fn new(conv: &Converter) -> ElfSection<Addr, Offset, Word> {
         ElfSection::<Addr, Offset, Word> {
-            converter: Converter { is_needed: false },
+            converter: *conv,
 
             sh_name: 0,
             sh_type: 0,
@@ -129,10 +127,6 @@ where
     }
     fn set_name(&mut self, _: std::string::String) {
         todo!()
-    }
-
-    fn set_converter(&mut self, converter: &Converter) {
-        self.converter = *converter;
     }
 }
 

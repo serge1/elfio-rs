@@ -82,6 +82,7 @@ mod utils;
 
 use header::*;
 use section::*;
+use segment::*;
 use std::fs::File;
 use std::io;
 use std::io::{prelude::*, BufReader};
@@ -97,6 +98,7 @@ pub struct Elfio {
     header: Box<dyn ElfHeaderTrait>,
     converter: utils::Converter,
     sections: Vec<Box<dyn ElfSectionTrait>>,
+    segments: Vec<Box<dyn ElfSegmentTrait>>,
 }
 
 // --------------------------------------------------------------------------
@@ -107,6 +109,7 @@ impl Elfio {
             converter: utils::Converter { is_needed: false },
             header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
             sections: Vec::new(),
+            segments: Vec::new(),
         }
     }
 
@@ -164,6 +167,7 @@ impl Elfio {
         };
 
         self.load_sections(reader)?;
+        self.load_segments(reader)?;
 
         Ok(())
     }
@@ -184,26 +188,56 @@ impl Elfio {
         let offset = self.header.get_sections_offset();
 
         for i in 0..num {
-            let section = self.create_section();
+            let mut section = self.create_section();
             reader.seek(io::SeekFrom::Start(i * entry_size + offset))?;
             section.load(reader)?;
+            self.sections.push(section);
         }
 
         Ok(())
     }
 
-    fn create_section(&mut self) -> &mut Box<dyn ElfSectionTrait> {
-        let mut section: Box<dyn ElfSectionTrait> = if self.header.get_class() == ELFCLASS32 {
-            Box::new(ElfSection::<Elf32Addr, Elf32Off, ElfWord>::new())
+    fn create_section(&mut self) -> Box<dyn ElfSectionTrait> {
+        let section: Box<dyn ElfSectionTrait> = if self.header.get_class() == ELFCLASS32 {
+            Box::new(ElfSection::<Elf32Addr, Elf32Off, ElfWord>::new(
+                &self.converter,
+            ))
         } else {
-            Box::new(ElfSection::<Elf64Addr, Elf64Off, ElfXword>::new())
+            Box::new(ElfSection::<Elf64Addr, Elf64Off, ElfXword>::new(
+                &self.converter,
+            ))
         };
 
-        section.set_converter(&self.converter);
-        self.sections.push(section);
+        section
+    }
 
-        let index = self.sections.len() - 1;
-        return self.sections.get_mut(index).unwrap();
+    fn load_segments(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        let entry_size = self.header.get_segment_entry_size() as Elf64Off;
+        let num = self.header.get_segments_num() as Elf64Off;
+        let offset = self.header.get_segments_offset();
+
+        for i in 0..num {
+            let mut segment = self.create_segment();
+            reader.seek(io::SeekFrom::Start(i * entry_size + offset))?;
+            segment.load(reader)?;
+            self.segments.push(segment);
+        }
+
+        Ok(())
+    }
+
+    fn create_segment(&mut self) -> Box<dyn ElfSegmentTrait> {
+        let segment: Box<dyn ElfSegmentTrait> = if self.header.get_class() == ELFCLASS32 {
+            Box::new(ElfSegment::<Elf32Addr, Elf32Off, ElfWord>::new(
+                &self.converter,
+            ))
+        } else {
+            Box::new(ElfSegment::<Elf64Addr, Elf64Off, ElfXword>::new(
+                &self.converter,
+            ))
+        };
+
+        segment
     }
 
     ELFIO_HEADER_ACCESS_GET!(u8, class);
