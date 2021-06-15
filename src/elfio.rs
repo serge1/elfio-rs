@@ -81,7 +81,9 @@ mod types;
 mod utils;
 
 use header::*;
+pub use section::ElfSectionAccessTrait;
 use section::*;
+pub use segment::ElfSegmentAccessTrait;
 use segment::*;
 use std::fs::File;
 use std::io;

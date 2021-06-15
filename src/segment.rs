@@ -25,6 +25,7 @@ use super::*;
 use num::{cast::AsPrimitive, Zero};
 
 // --------------------------------------------------------------------------
+/// Read/Write access to segment properties
 pub trait ElfSegmentAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, type);
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, flags);

@@ -2,8 +2,8 @@
 
 ## Not yet done
 
-- Implement Segment Trait and Struct
 - Decide regarding template args. Maybe a single param is enough
+- Implement data access for sections and segments
 
 ## Done
 
@@ -21,3 +21,4 @@
 - Start to use endianness converter
 - Investigate use std::convert::TryInto
 - Implement Section Trait and Struct
+- Implement Segment Trait and Struct

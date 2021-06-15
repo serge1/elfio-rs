@@ -25,6 +25,7 @@ use super::*;
 use num::{cast::AsPrimitive, Zero};
 
 // --------------------------------------------------------------------------
+/// Read/Write access to section properties
 pub trait ElfSectionAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(String, name);
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, name_string_offset);
