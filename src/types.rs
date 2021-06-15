@@ -118,12 +118,15 @@ pub const SHN_LORESERVE: ElfHalf = 0xFF00;
 pub const SHN_LOPROC: ElfHalf = 0xFF00;
 /// Values in this inclusive range are reserved for processor-specific semantics
 pub const SHN_HIPROC: ElfHalf = 0xFF1F;
+/// Operational system specific low index
 pub const SHN_LOOS: ElfHalf = 0xFF20;
+/// Operational system specific high index
 pub const SHN_HIOS: ElfHalf = 0xFF3F;
 /// This value specifies absolute values for the corresponding reference
 pub const SHN_ABS: ElfHalf = 0xFFF1;
 /// Symbols defined relative to this section are common symbols
 pub const SHN_COMMON: ElfHalf = 0xFFF2;
+/// This value specifies the upper bound of the range of reserved indexes.
 pub const SHN_XINDEX: ElfHalf = 0xFFFF;
 /// This value specifies the upper bound of the range of reserved indexes.
 pub const SHN_HIRESERVE: ElfHalf = 0xFFFF;
@@ -156,12 +159,19 @@ pub const SHT_REL: ElfWord = 9;
 pub const SHT_SHLIB: ElfWord = 10;
 /// These sections hold a symbol table.
 pub const SHT_DYNSYM: ElfWord = 11;
+/// This section contains an array of pointers to initialization functions
 pub const SHT_INIT_ARRAY: ElfWord = 14;
+/// This section contains an array of pointers to termination functions
 pub const SHT_FINI_ARRAY: ElfWord = 15;
+/// This section contains an array of pointers to functions that are invoked before all other initialization functions
 pub const SHT_PREINIT_ARRAY: ElfWord = 16;
+/// This section defines a section group
 pub const SHT_GROUP: ElfWord = 17;
+/// The section header index of the associated symbol table section
 pub const SHT_SYMTAB_SHNDX: ElfWord = 18;
+/// Values in this inclusive range are reserved for operating system-specific semantics
 pub const SHT_LOOS: ElfWord = 0x60000000;
+/// Values in this inclusive range are reserved for operating system-specific semantics
 pub const SHT_HIOS: ElfWord = 0x6fffffff;
 /// Values in this inclusive range are reserved for processor-specific semantics
 pub const SHT_LOPROC: ElfWord = 0x70000000;
@@ -181,14 +191,21 @@ pub const SHF_WRITE: ElfXword = 0x1;
 pub const SHF_ALLOC: ElfXword = 0x2;
 /// The section contains executable machine instructions
 pub const SHF_EXECINSTR: ElfXword = 0x4;
-///
+/// The data in the section may be merged to eliminate duplication
 pub const SHF_MERGE: ElfXword = 0x10;
+/// The data elements in the section consist of null-terminated character strings
 pub const SHF_STRINGS: ElfXword = 0x20;
+/// The sh_info field of this section header holds a section header table index
 pub const SHF_INFO_LINK: ElfXword = 0x40;
+/// This flag adds special ordering requirements for link editors
 pub const SHF_LINK_ORDER: ElfXword = 0x80;
+/// This section requires special OS-specific processing
 pub const SHF_OS_NONCONFORMING: ElfXword = 0x100;
+/// This section is a member (perhaps the only one) of a section group
 pub const SHF_GROUP: ElfXword = 0x200;
+/// This section holds Thread-Local Storage
 pub const SHF_TLS: ElfXword = 0x400;
+/// All bits included in this mask are reserved for operating system-specific semantics
 pub const SHF_MASKOS: ElfXword = 0x0ff00000;
 /// All bits included in this mask are reserved for processor-specific semantics
 pub const SHF_MASKPROC: ElfXword = 0xF0000000;
@@ -199,17 +216,29 @@ pub const SHF_MASKPROC: ElfXword = 0xF0000000;
 // pub const GRP_MASKPROC 0xf0000000
 
 // Segment types
+/// The array element is unused; other members' values are undefined
 pub const PT_NULL: ElfWord = 0;
+/// The array element specifies a loadable segment, described by p_filesz and p_memsz
 pub const PT_LOAD: ElfWord = 1;
+/// The array element specifies dynamic linking information
 pub const PT_DYNAMIC: ElfWord = 2;
+/// The array element specifies the location and size of a null-terminated path name to invoke as an interpreter
 pub const PT_INTERP: ElfWord = 3;
+/// The array element specifies the location and size of auxiliary information
 pub const PT_NOTE: ElfWord = 4;
+/// This segment type is reserved but has unspecified semantics
 pub const PT_SHLIB: ElfWord = 5;
+/// The array element, if present, specifies the location and size of the program header table itself
 pub const PT_PHDR: ElfWord = 6;
+/// The array element specifies the Thread-Local Storage template
 pub const PT_TLS: ElfWord = 7;
+/// Values in this inclusive range are reserved for operating system-specific semantics
 pub const PT_LOOS: ElfWord = 0x60000000;
+/// Values in this inclusive range are reserved for operating system-specific semantics
 pub const PT_HIOS: ElfWord = 0x6fffffff;
+/// Values in this inclusive range are reserved for processor-specific semantics
 pub const PT_LOPROC: ElfWord = 0x70000000;
+/// Values in this inclusive range are reserved for processor-specific semantics
 pub const PT_HIPROC: ElfWord = 0x7FFFFFFF;
 
 // Segment flags

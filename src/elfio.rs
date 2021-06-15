@@ -36,9 +36,9 @@ THE SOFTWARE.
    limitations under the License.
 */
 
-//#![warn(missing_docs)]
+#![warn(missing_docs)]
 
-//! 'elfio' is a Rust library intended for reading and generating
+//! 'elfio' is a Rust library intended for reading and generation
 //! files in the ELF binary format. The library supports processing
 //! of ELF files for 32- and 64-bit architectures regardless of their
 //! endianess
@@ -55,11 +55,11 @@ THE SOFTWARE.
 //!     let elf_file = File::open("tests/files/hello_64")?;
 //!     let mut file_reader = BufReader::new(elf_file);
 //!
-//!     let mut reader = elfio::Elfio::new();
+//!     let mut elf = elfio::Elfio::new();
 //!
-//!     reader.load(&mut file_reader)?;
+//!     elf.load(&mut file_reader)?;
 //!
-//!     match reader.get_type() {
+//!     match elf.get_type() {
 //!         elfio::ET_REL => println!("Object ELF file"),
 //!         elfio::ET_EXEC => println!("Executable ELF file"),
 //!         elfio::ET_DYN => println!("Shared library ELF file"),
@@ -108,6 +108,26 @@ impl Elfio {
         Elfio {
             converter: utils::Converter { is_needed: false },
             header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
+            sections: Vec::new(),
+            segments: Vec::new(),
+        }
+    }
+
+    /// Create a new instance with defined encoding and endianess
+    pub fn new_(encoding: u8, endianess: u8) -> Elfio {
+        Elfio {
+            converter: if (endianess == ELFDATA2LSB && cfg!(target_endian = "little"))
+                || endianess == ELFDATA2MSB && cfg!(target_endian = "big")
+            {
+                utils::Converter { is_needed: false }
+            } else {
+                utils::Converter { is_needed: true }
+            },
+            header: if encoding == ELFCLASS64 {
+                Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new())
+            } else {
+                Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new())
+            },
             sections: Vec::new(),
             segments: Vec::new(),
         }

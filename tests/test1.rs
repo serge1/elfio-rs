@@ -216,12 +216,40 @@ fn read_le_64() -> io::Result<()> {
 
 #[test]
 fn write_read_le_32() -> io::Result<()> {
-    let elf_file = File::open("tests/files/hello_32")?;
-    let mut reader = BufReader::new(elf_file);
+    let mut elf = Elfio::new_(elfio::ELFCLASS32, elfio::ELFDATA2LSB);
 
-    let mut elf = Elfio::new();
+    elf.set_version(1000);
+    elf.set_os_abi(83);
+    elf.set_abi_version(84);
+    elf.set_type(1003);
+    elf.set_machine(1005);
+    elf.set_flags(1006);
+    elf.set_entry(1007);
+    elf.set_sections_num(1008);
+    elf.set_sections_offset(1009);
+    elf.set_segments_num(10010);
+    elf.set_segments_offset(10011);
+    elf.set_section_name_str_index(10012);
 
-    elf.load(&mut reader)?;
+    assert_eq!(elf.get_version(), 1000);
+    assert_eq!(elf.get_os_abi(), 83);
+    assert_eq!(elf.get_abi_version(), 84);
+    assert_eq!(elf.get_type(), 1003);
+    assert_eq!(elf.get_machine(), 1005);
+    assert_eq!(elf.get_flags(), 1006);
+    assert_eq!(elf.get_entry(), 1007);
+    assert_eq!(elf.get_sections_num(), 1008);
+    assert_eq!(elf.get_sections_offset(), 1009);
+    assert_eq!(elf.get_segments_num(), 10010);
+    assert_eq!(elf.get_segments_offset(), 10011);
+    assert_eq!(elf.get_section_name_str_index(), 10012);
+
+    Ok(())
+}
+
+#[test]
+fn write_read_le_64() -> io::Result<()> {
+    let mut elf = Elfio::new_(elfio::ELFCLASS64, elfio::ELFDATA2MSB);
 
     elf.set_version(1000);
     elf.set_os_abi(83);

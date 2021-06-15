@@ -90,6 +90,7 @@ where
 }
 
 // --------------------------------------------------------------------------
+/// Section attributes access trait
 impl<Addr, Offset, Word> ElfSectionTrait for ElfSection<Addr, Offset, Word>
 where
     u32: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
