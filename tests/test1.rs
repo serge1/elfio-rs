@@ -55,6 +55,7 @@ fn read_le_32() -> io::Result<()> {
     assert_eq!(elf.get_section_name_str_index(), 25);
 
     let sections = elf.get_sections();
+    assert_eq!(sections.len(), 28);
 
     let section = sections.get(0).unwrap();
     assert_eq!(section.get_type(), 0);
@@ -88,6 +89,39 @@ fn read_le_32() -> io::Result<()> {
     assert_eq!(section.get_address(), 0x080494a0);
     assert_eq!(section.get_size(), 0xc8);
     assert_eq!(section.get_offset(), 0x4a0);
+
+    let segments = elf.get_segments();
+    assert_eq!(segments.len(), 7);
+
+    let segment = segments.get(0).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_PHDR);
+    assert_eq!(segment.get_offset(), 0x000034);
+    assert_eq!(segment.get_virtual_address(), 0x08048034);
+    assert_eq!(segment.get_physical_address(), 0x08048034);
+    assert_eq!(segment.get_file_size(), 0x000e0);
+    assert_eq!(segment.get_memory_size(), 0x000e0);
+    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_X);
+    assert_eq!(segment.get_align(), 4);
+
+    let segment = segments.get(1).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_INTERP);
+    assert_eq!(segment.get_offset(), 0x000114);
+    assert_eq!(segment.get_virtual_address(), 0x08048114);
+    assert_eq!(segment.get_physical_address(), 0x08048114);
+    assert_eq!(segment.get_file_size(), 0x00013);
+    assert_eq!(segment.get_memory_size(), 0x00013);
+    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_align(), 1);
+
+    let segment = segments.get(4).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_DYNAMIC);
+    assert_eq!(segment.get_offset(), 0x0004a0);
+    assert_eq!(segment.get_virtual_address(), 0x080494a0);
+    assert_eq!(segment.get_physical_address(), 0x080494a0);
+    assert_eq!(segment.get_file_size(), 0x000c8);
+    assert_eq!(segment.get_memory_size(), 0x000c8);
+    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_W);
+    assert_eq!(segment.get_align(), 4);
 
     Ok(())
 }
@@ -143,6 +177,39 @@ fn read_le_64() -> io::Result<()> {
     assert_eq!(section.get_address(), 0x400200);
     assert_eq!(section.get_size(), 0x1c);
     assert_eq!(section.get_offset(), 0x200);
+
+    let segments = elf.get_segments();
+    assert_eq!(segments.len(), 8);
+
+    let segment = segments.get(0).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_PHDR);
+    assert_eq!(segment.get_offset(), 0x000040);
+    assert_eq!(segment.get_virtual_address(), 0x0000000000400040);
+    assert_eq!(segment.get_physical_address(), 0x0000000000400040);
+    assert_eq!(segment.get_file_size(), 0x00000000000001c0);
+    assert_eq!(segment.get_memory_size(), 0x00000000000001c0);
+    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_X);
+    assert_eq!(segment.get_align(), 8);
+
+    let segment = segments.get(1).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_INTERP);
+    assert_eq!(segment.get_offset(), 0x000200);
+    assert_eq!(segment.get_virtual_address(), 0x400200);
+    assert_eq!(segment.get_physical_address(), 0x400200);
+    assert_eq!(segment.get_file_size(), 0x0001c);
+    assert_eq!(segment.get_memory_size(), 0x0001c);
+    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_align(), 1);
+
+    let segment = segments.get(4).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_DYNAMIC);
+    assert_eq!(segment.get_offset(), 0x0000000000000698);
+    assert_eq!(segment.get_virtual_address(), 0x0000000000600698);
+    assert_eq!(segment.get_physical_address(), 0x0000000000600698);
+    assert_eq!(segment.get_file_size(), 0x0000000000000190);
+    assert_eq!(segment.get_memory_size(), 0x0000000000000190);
+    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_W);
+    assert_eq!(segment.get_align(), 8);
 
     Ok(())
 }
@@ -266,6 +333,39 @@ fn read_be_ppc64() -> io::Result<()> {
     assert_eq!(section.get_address(), 0x20000);
     assert_eq!(section.get_size(), 0x5a4);
     assert_eq!(section.get_offset(), 0x10000);
+
+    let segments = elf.get_segments();
+    assert_eq!(segments.len(), 8);
+
+    let segment = segments.get(0).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_PHDR);
+    assert_eq!(segment.get_offset(), 0x000040);
+    assert_eq!(segment.get_virtual_address(), 0x0000000000000040);
+    assert_eq!(segment.get_physical_address(), 0x0000000000000040);
+    assert_eq!(segment.get_file_size(), 0x00000000000001c0);
+    assert_eq!(segment.get_memory_size(), 0x00000000000001c0);
+    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_align(), 8);
+
+    let segment = segments.get(1).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_INTERP);
+    assert_eq!(segment.get_offset(), 0x000200);
+    assert_eq!(segment.get_virtual_address(), 0x200);
+    assert_eq!(segment.get_physical_address(), 0x200);
+    assert_eq!(segment.get_file_size(), 0x00011);
+    assert_eq!(segment.get_memory_size(), 0x00011);
+    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_align(), 1);
+
+    let segment = segments.get(4).unwrap();
+    assert_eq!(segment.get_type(), elfio::PT_DYNAMIC);
+    assert_eq!(segment.get_offset(), 0x000000000000f880);
+    assert_eq!(segment.get_virtual_address(), 0x000000000001f880);
+    assert_eq!(segment.get_physical_address(), 0x000000000001f880);
+    assert_eq!(segment.get_file_size(), 0x0000000000000200);
+    assert_eq!(segment.get_memory_size(), 0x0000000000000200);
+    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_W);
+    assert_eq!(segment.get_align(), 8);
 
     Ok(())
 }

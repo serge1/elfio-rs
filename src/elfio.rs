@@ -177,6 +177,11 @@ impl Elfio {
         return &self.sections;
     }
 
+    /// Retrieve all ELF file segments
+    pub fn get_segments(&self) -> &Vec<Box<dyn ElfSegmentTrait>> {
+        return &self.segments;
+    }
+
     /// Retrieve ELF file section by its name
     pub fn get_section_by_name(&self) -> &Box<dyn ElfSectionTrait> {
         todo!()
@@ -230,10 +235,12 @@ impl Elfio {
         let segment: Box<dyn ElfSegmentTrait> = if self.header.get_class() == ELFCLASS32 {
             Box::new(ElfSegment::<Elf32Addr, Elf32Off, ElfWord>::new(
                 &self.converter,
+                self.header.get_class(),
             ))
         } else {
             Box::new(ElfSegment::<Elf64Addr, Elf64Off, ElfXword>::new(
                 &self.converter,
+                self.header.get_class(),
             ))
         };
 

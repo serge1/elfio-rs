@@ -197,3 +197,29 @@ pub const SHF_MASKPROC: ElfXword = 0xF0000000;
 // pub const GRP_COMDAT   0x1
 // pub const GRP_MASKOS   0x0ff00000
 // pub const GRP_MASKPROC 0xf0000000
+
+// Segment types
+pub const PT_NULL: ElfWord = 0;
+pub const PT_LOAD: ElfWord = 1;
+pub const PT_DYNAMIC: ElfWord = 2;
+pub const PT_INTERP: ElfWord = 3;
+pub const PT_NOTE: ElfWord = 4;
+pub const PT_SHLIB: ElfWord = 5;
+pub const PT_PHDR: ElfWord = 6;
+pub const PT_TLS: ElfWord = 7;
+pub const PT_LOOS: ElfWord = 0x60000000;
+pub const PT_HIOS: ElfWord = 0x6fffffff;
+pub const PT_LOPROC: ElfWord = 0x70000000;
+pub const PT_HIPROC: ElfWord = 0x7FFFFFFF;
+
+// Segment flags
+/// Segment's Execute flag
+pub const PF_X: ElfWord = 1;
+/// Segment's Write flag
+pub const PF_W: ElfWord = 2;
+/// Segment's Read flag
+pub const PF_R: ElfWord = 4;
+/// Segment's Unspecified flag
+pub const PF_MASKOS: ElfWord = 0x0ff00000;
+/// Segment's Unspecified flag
+pub const PF_MASKPROC: ElfWord = 0xf0000000;
