@@ -79,6 +79,13 @@ fn read_le_32() -> io::Result<()> {
     assert_eq!(section.get_size(), 0x1a8);
     assert_eq!(section.get_offset(), 0x2b0);
 
+    let data = section.get_data();
+    assert_eq!(data[0], 0x31);
+    assert_eq!(data[1], 0xED);
+    assert_eq!(data[2], 0x5E);
+    assert_eq!(data[0x1A6], 0x5D);
+    assert_eq!(data[0x1A7], 0xC3);
+
     let section = sections.get(19).unwrap();
     assert_eq!(section.get_type(), elfio::SHT_DYNAMIC);
     assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_WRITE);
@@ -361,6 +368,14 @@ fn read_be_ppc64() -> io::Result<()> {
     assert_eq!(section.get_address(), 0x20000);
     assert_eq!(section.get_size(), 0x5a4);
     assert_eq!(section.get_offset(), 0x10000);
+
+    let data = section.get_data();
+    assert_eq!(data[0], 0x00);
+    assert_eq!(data[0xD], 0x02);
+    assert_eq!(data[0x10], 0x0B);
+    assert_eq!(data[0x5A0], 0x35);
+    assert_eq!(data[0x5A2], 0x31);
+    assert_eq!(data[0x5A3], 0x00);
 
     let segments = elf.get_segments();
     assert_eq!(segments.len(), 8);

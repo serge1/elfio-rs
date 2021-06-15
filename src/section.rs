@@ -38,6 +38,11 @@ pub trait ElfSectionAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, info);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, addr_align);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, entry_size);
+
+    /// Returns section data
+    fn get_data(&self) -> &[u8];
+    /// Initialize section data
+    fn set_data(&mut self, data: &[u8]);
 }
 
 // --------------------------------------------------------------------------
@@ -60,6 +65,7 @@ pub struct ElfSection<Addr, Offset, Word> {
     sh_entsize: Word,
 
     converter: Converter,
+    data: Vec<u8>
 }
 
 // --------------------------------------------------------------------------
@@ -75,6 +81,7 @@ where
     pub fn new(conv: &Converter) -> ElfSection<Addr, Offset, Word> {
         ElfSection::<Addr, Offset, Word> {
             converter: *conv,
+            data: Vec::new(),
 
             sh_name: 0,
             sh_type: 0,
@@ -130,11 +137,21 @@ where
     fn set_name(&mut self, _: std::string::String) {
         todo!()
     }
+
+    fn get_data(&self) -> &[u8] {
+        &self.data
+    }
+
+    fn set_data(&mut self, data: &[u8]) {
+        self.data = data.to_vec();
+    }
 }
 
 // --------------------------------------------------------------------------
 impl<Addr, Offset, Word> Load for ElfSection<Addr, Offset, Word>
 where
+    u32: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
+    u64: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
     Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
@@ -151,6 +168,10 @@ where
         self.sh_info.load(reader)?;
         self.sh_addralign.load(reader)?;
         self.sh_entsize.load(reader)?;
+
+        reader.seek(io::SeekFrom::Start(self.get_offset()))?;
+        self.data = vec![0; self.get_size().as_()];
+        reader.read(&mut self.data)?;
 
         Ok(())
     }
