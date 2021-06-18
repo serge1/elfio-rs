@@ -27,7 +27,7 @@ use num::{cast::AsPrimitive, Zero};
 // --------------------------------------------------------------------------
 /// Read/Write access to section properties
 pub trait ElfSectionAccessTrait {
-    ELFIO_GET_SET_ACCESS_DECL!(String, name);
+    //    ELFIO_GET_SET_ACCESS_DECL!(String, name);
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, name_string_offset);
     ELFIO_GET_SET_ACCESS_DECL!(ElfWord, type);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, flags);
@@ -39,6 +39,10 @@ pub trait ElfSectionAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, addr_align);
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, entry_size);
 
+    /// Get section name
+    fn get_name(&self) -> &String;
+    /// Set section name
+    fn set_name(&mut self, name: &String);
     /// Returns section data
     fn get_data(&self) -> &[u8];
     /// Initialize section data
@@ -64,8 +68,9 @@ pub struct ElfSection<Addr, Offset, Word> {
     sh_addralign: Word,
     sh_entsize: Word,
 
+    name: String,
     converter: Converter,
-    data: Vec<u8>
+    data: Vec<u8>,
 }
 
 // --------------------------------------------------------------------------
@@ -79,8 +84,9 @@ where
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
     pub fn new(conv: &Converter) -> ElfSection<Addr, Offset, Word> {
-        ElfSection::<Addr, Offset, Word> {
+        Self {
             converter: *conv,
+            name: String::from(""),
             data: Vec::new(),
 
             sh_name: 0,
@@ -120,7 +126,7 @@ where
     Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
-    ELFIO_GET_SET_ACCESS!(ElfWord, name_string_offset, sh_addr);
+    ELFIO_GET_SET_ACCESS!(ElfWord, name_string_offset, sh_name);
     ELFIO_GET_SET_ACCESS!(ElfWord, type, sh_type);
     ELFIO_GET_SET_ACCESS!(ElfXword, flags, sh_flags);
     ELFIO_GET_SET_ACCESS!(Elf64Addr, address, sh_addr);
@@ -131,11 +137,12 @@ where
     ELFIO_GET_SET_ACCESS!(ElfXword, addr_align, sh_addralign);
     ELFIO_GET_SET_ACCESS!(ElfXword, entry_size, sh_entsize);
 
-    fn get_name(&self) -> std::string::String {
-        todo!()
+    fn get_name(&self) -> &String {
+        &self.name
     }
-    fn set_name(&mut self, _: std::string::String) {
-        todo!()
+
+    fn set_name(&mut self, name: &String) {
+        self.name = name.to_string();
     }
 
     fn get_data(&self) -> &[u8] {

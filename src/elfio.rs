@@ -106,7 +106,7 @@ pub struct Elfio {
 // --------------------------------------------------------------------------
 impl Elfio {
     /// Create a new instance
-    pub fn new() -> Elfio {
+    pub fn new() -> Self {
         Elfio {
             converter: utils::Converter { is_needed: false },
             header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
@@ -116,7 +116,7 @@ impl Elfio {
     }
 
     /// Create a new instance with defined encoding and endianess
-    pub fn new_(encoding: u8, endianess: u8) -> Elfio {
+    pub fn new_(encoding: u8, endianess: u8) -> Self {
         Elfio {
             converter: if (endianess == ELFDATA2LSB && cfg!(target_endian = "little"))
                 || endianess == ELFDATA2MSB && cfg!(target_endian = "big")
@@ -221,7 +221,26 @@ impl Elfio {
             self.sections.push(section);
         }
 
+        let shstrndx = self.get_section_name_str_index();
+        if shstrndx != SHN_UNDEF {
+            for i in 1..num as usize {
+                let pos = self.sections[i].get_name_string_offset() as usize;
+                let strsec = &self.sections[shstrndx as usize];
+                let strdata = strsec.get_data();
+                let name = Elfio::str_from_u8_nul_utf8_unchecked(&strdata[pos..]).to_string();
+                self.sections[i].set_name(&name);
+            }
+        }
+
         Ok(())
+    }
+
+    fn str_from_u8_nul_utf8_unchecked(utf8_src: &[u8]) -> &str {
+        let nul_range_end = utf8_src
+            .iter()
+            .position(|&c| c == b'\0')
+            .unwrap_or(utf8_src.len()); // default to length if no `\0` present
+        unsafe { ::std::str::from_utf8_unchecked(&utf8_src[0..nul_range_end]) }
     }
 
     fn create_section(&mut self) -> Box<dyn ElfSectionTrait> {
@@ -288,4 +307,13 @@ impl Elfio {
     ELFIO_HEADER_ACCESS_GET_SET!(ElfHalf, segments_num);
     ELFIO_HEADER_ACCESS_GET_SET!(Elf64Off, segments_offset);
     ELFIO_HEADER_ACCESS_GET_SET!(ElfHalf, section_name_str_index);
+}
+
+impl std::fmt::Debug for Elfio {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Elfio")
+            //  .field("x", &self.x)
+            //  .field("y", &self.y)
+            .finish()
+    }
 }

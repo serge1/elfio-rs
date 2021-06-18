@@ -43,7 +43,6 @@ pub trait ElfSegmentTrait: ElfSegmentAccessTrait + Load {}
 // --------------------------------------------------------------------------
 // ELF file header
 #[repr(C)]
-#[derive(Debug)]
 pub struct ElfSegment<Addr, Offset, Word> {
     p_type: ElfWord,
     p_flags: ElfWord,
@@ -69,7 +68,7 @@ where
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
     pub fn new(conv: &Converter, class: u8) -> ElfSegment<Addr, Offset, Word> {
-        ElfSegment::<Addr, Offset, Word> {
+        Self {
             converter: *conv,
             class: class,
 

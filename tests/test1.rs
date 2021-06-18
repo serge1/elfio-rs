@@ -58,6 +58,7 @@ fn read_le_32() -> io::Result<()> {
     assert_eq!(sections.len(), 28);
 
     let section = sections.get(0).unwrap();
+    assert_eq!(section.get_name(), "");
     assert_eq!(section.get_type(), 0);
     assert_eq!(section.get_flags(), 0);
     assert_eq!(section.get_info(), 0);
@@ -69,6 +70,7 @@ fn read_le_32() -> io::Result<()> {
     assert_eq!(section.get_offset(), 0);
 
     let section = sections.get(12).unwrap();
+    assert_eq!(section.get_name(), ".text");
     assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
     assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_EXECINSTR);
     assert_eq!(section.get_info(), 0);
@@ -87,6 +89,7 @@ fn read_le_32() -> io::Result<()> {
     assert_eq!(data[0x1A7], 0xC3);
 
     let section = sections.get(19).unwrap();
+    assert_eq!(section.get_name(), ".dynamic");
     assert_eq!(section.get_type(), elfio::SHT_DYNAMIC);
     assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_WRITE);
     assert_eq!(section.get_info(), 0);
@@ -164,6 +167,7 @@ fn read_le_64() -> io::Result<()> {
     let sections = elf.get_sections();
 
     let section = sections.get(0).unwrap();
+    assert_eq!(section.get_name(), "");
     assert_eq!(section.get_type(), 0);
     assert_eq!(section.get_flags(), 0);
     assert_eq!(section.get_info(), 0);
@@ -175,6 +179,7 @@ fn read_le_64() -> io::Result<()> {
     assert_eq!(section.get_offset(), 0);
 
     let section = sections.get(1).unwrap();
+    assert_eq!(section.get_name(), ".interp");
     assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
     assert_eq!(section.get_flags(), elfio::SHF_ALLOC);
     assert_eq!(section.get_info(), 0);
@@ -348,6 +353,7 @@ fn read_be_ppc64() -> io::Result<()> {
 
     let sections = elf.get_sections();
     let section = sections.get(0).unwrap();
+    assert_eq!(section.get_name(), "");
     assert_eq!(section.get_type(), 0);
     assert_eq!(section.get_flags(), 0);
     assert_eq!(section.get_info(), 0);
@@ -359,6 +365,7 @@ fn read_be_ppc64() -> io::Result<()> {
     assert_eq!(section.get_offset(), 0);
 
     let section = sections.get(24).unwrap();
+    assert_eq!(section.get_name(), ".data");
     assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
     assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_WRITE);
     assert_eq!(section.get_info(), 0);

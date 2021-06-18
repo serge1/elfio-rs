@@ -2,8 +2,8 @@
 
 ## Not yet done
 
+- Implement string table section accessor
 - Decide regarding template args. Maybe a single param is enough
-- Implement data access for sections and segments
 
 ## Done
 
@@ -22,3 +22,4 @@
 - Investigate use std::convert::TryInto
 - Implement Section Trait and Struct
 - Implement Segment Trait and Struct
+- Implement data access for sections and segments
