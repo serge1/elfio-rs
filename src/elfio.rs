@@ -77,6 +77,7 @@ mod macros;
 mod header;
 mod section;
 mod segment;
+mod strings;
 mod types;
 mod utils;
 
@@ -88,6 +89,7 @@ use segment::*;
 use std::fs::File;
 use std::io;
 use std::io::{prelude::*, BufReader};
+pub use strings::*;
 pub use types::*;
 
 /// Elfio - the main struct of the library. All access to ELF files attributes
@@ -205,8 +207,14 @@ impl Elfio {
     }
 
     /// Retrieve ELF file section by its name
-    pub fn get_section_by_name(&self) -> &Box<dyn ElfSectionTrait> {
-        todo!()
+    pub fn get_section_by_name(&self, section_name: &String) -> Option<&Box<dyn ElfSectionTrait>> {
+        for section in &self.sections {
+            if section.get_name() == section_name {
+                return Some(section);
+            }
+        }
+
+        None
     }
 
     fn load_sections(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
@@ -223,12 +231,11 @@ impl Elfio {
 
         let shstrndx = self.get_section_name_str_index();
         if shstrndx != SHN_UNDEF {
-            for i in 1..num as usize {
-                let pos = self.sections[i].get_name_string_offset() as usize;
-                let strsec = &self.sections[shstrndx as usize];
-                let strdata = strsec.get_data();
-                let name = Elfio::str_from_u8_nul_utf8_unchecked(&strdata[pos..]).to_string();
-                self.sections[i].set_name(&name);
+            for i in 1..num {
+                let pos = self.sections[i as usize].get_name_string_offset();
+                let acc = StringSectionAccessor::new(&self.sections[shstrndx as usize]);
+                let name = acc.get_string(pos);
+                self.sections[i as usize].set_name(&name);
             }
         }
 

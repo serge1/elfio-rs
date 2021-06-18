@@ -2,7 +2,7 @@
 
 ## Not yet done
 
-- Implement string table section accessor
+- Implement symbol table section accessor
 - Decide regarding template args. Maybe a single param is enough
 
 ## Done
@@ -23,3 +23,4 @@
 - Implement Section Trait and Struct
 - Implement Segment Trait and Struct
 - Implement data access for sections and segments
+- Implement string table section accessor
