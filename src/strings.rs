@@ -65,23 +65,19 @@ pub struct StringSectionAccessor<'a> {
 impl<'a> StringSectionAccessor<'a> {
     /// Creates a new instance of the string table accessor
     pub fn new(section: &'a Box<dyn ElfSectionTrait>) -> StringSectionAccessor<'a> {
-        StringSectionAccessor { section: section }
+        StringSectionAccessor { section }
     }
 
     /// Returns a string from string table by its index
     pub fn get_string(&self, index: ElfWord) -> String {
         let strdata = self.section.get_data();
-        let ret = Elfio::str_from_u8_nul_utf8_unchecked(&strdata[index as usize..]).to_string();
-
-        return ret;
+        Elfio::str_from_u8_nul_utf8_unchecked(&strdata[index as usize..]).to_string()
     }
 }
 
 impl<'a> StringSectionAccessorTrait for StringSectionAccessor<'a> {
     fn get_string1(&self, index: ElfWord) -> String {
         let strdata = self.section.get_data();
-        let ret = Elfio::str_from_u8_nul_utf8_unchecked(&strdata[index as usize..]).to_string();
-
-        return ret;
+        Elfio::str_from_u8_nul_utf8_unchecked(&strdata[index as usize..]).to_string()
     }
 }

@@ -200,16 +200,16 @@ impl Elfio {
 
     /// Retrieve all ELF file sections
     pub fn get_sections(&self) -> &Vec<Box<dyn ElfSectionTrait>> {
-        return &self.sections;
+        &self.sections
     }
 
     /// Retrieve all ELF file segments
     pub fn get_segments(&self) -> &Vec<Box<dyn ElfSegmentTrait>> {
-        return &self.segments;
+        &self.segments
     }
 
     /// Retrieve ELF file section by its name
-    pub fn get_section_by_name(&self, section_name: &String) -> Option<&Box<dyn ElfSectionTrait>> {
+    pub fn get_section_by_name(&self, section_name: &str) -> Option<&Box<dyn ElfSectionTrait>> {
         for section in &self.sections {
             if section.get_name() == section_name {
                 return Some(section);

@@ -42,7 +42,7 @@ pub trait ElfSectionAccessTrait {
     /// Get section name
     fn get_name(&self) -> &String;
     /// Set section name
-    fn set_name(&mut self, name: &String);
+    fn set_name(&mut self, name: &str);
     /// Returns section data
     fn get_data(&self) -> &[u8];
     /// Initialize section data
@@ -141,7 +141,7 @@ where
         &self.name
     }
 
-    fn set_name(&mut self, name: &String) {
+    fn set_name(&mut self, name: &str) {
         self.name = name.to_string();
     }
 

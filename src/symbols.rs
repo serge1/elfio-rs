@@ -31,7 +31,7 @@ pub struct SymbolSectionAccessor<'a> {
 impl<'a> SymbolSectionAccessor<'a> {
     /// Creates a new instance of the symbol table accessor
     pub fn new(elfio: &'a Elfio, section: &'a Box<dyn ElfSectionTrait>) -> SymbolSectionAccessor<'a> {
-        SymbolSectionAccessor { _elfio:elfio, section: section }
+        SymbolSectionAccessor { _elfio:elfio, section }
     }
 
     /// Returns number of symbols 
@@ -40,6 +40,6 @@ impl<'a> SymbolSectionAccessor<'a> {
             return self.section.get_size() / self.section.get_entry_size()
         }
 
-        return 0;
+        0
     }
 }

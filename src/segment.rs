@@ -70,7 +70,7 @@ where
     pub fn new(conv: &Converter, class: u8) -> ElfSegment<Addr, Offset, Word> {
         Self {
             converter: *conv,
-            class: class,
+            class,
 
             p_type: 0,
             p_flags: 0,
@@ -125,25 +125,23 @@ where
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+        self.p_type.load(reader)?;
         if self.class == ELFCLASS64 {
-            self.p_type.load(reader)?;
             self.p_flags.load(reader)?;
             self.p_offset.load(reader)?;
             self.p_vaddr.load(reader)?;
             self.p_paddr.load(reader)?;
             self.p_filesz.load(reader)?;
             self.p_memsz.load(reader)?;
-            self.p_align.load(reader)?;
         } else {
-            self.p_type.load(reader)?;
             self.p_offset.load(reader)?;
             self.p_vaddr.load(reader)?;
             self.p_paddr.load(reader)?;
             self.p_filesz.load(reader)?;
             self.p_memsz.load(reader)?;
             self.p_flags.load(reader)?;
-            self.p_align.load(reader)?;
         }
+        self.p_align.load(reader)?;
 
         Ok(())
     }

@@ -35,7 +35,7 @@ fn sym_le_32() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    let section = match elf.get_section_by_name(&".symtab".to_string()) {
+    let section = match elf.get_section_by_name(&".symtab") {
         Some(s) => s,
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };
@@ -55,7 +55,7 @@ fn sym_le_64() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    let section = match elf.get_section_by_name(&".symtab".to_string()) {
+    let section = match elf.get_section_by_name(&".symtab") {
         Some(s) => s,
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };
@@ -75,7 +75,7 @@ fn sym_be_32() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    let section = match elf.get_section_by_name(&".symtab".to_string()) {
+    let section = match elf.get_section_by_name(&".symtab") {
         Some(s) => s,
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };
@@ -95,7 +95,7 @@ fn sym_be_64() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    let section = match elf.get_section_by_name(&".dynsym".to_string()) {
+    let section = match elf.get_section_by_name(&".dynsym") {
         Some(s) => s,
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };

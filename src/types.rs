@@ -74,11 +74,11 @@ pub const EI_NIDENT: usize = 16;
 /// Identification value
 pub const ELFMAG0: u8 = 0x7F;
 /// Identification value
-pub const ELFMAG1: u8 = 'E' as u8;
+pub const ELFMAG1: u8 = b'E';
 /// Identification value
-pub const ELFMAG2: u8 = 'L' as u8;
+pub const ELFMAG2: u8 = b'L';
 /// Identification value
-pub const ELFMAG3: u8 = 'F' as u8;
+pub const ELFMAG3: u8 = b'F';
 
 // File class
 /// Invalid class
