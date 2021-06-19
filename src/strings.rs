@@ -27,7 +27,7 @@ trait StringSectionAccessorTrait {
     fn get_string1(&self, index: ElfWord) -> String;
 }
 
-/// A section data accessor dedicated to string tables
+/// A section data accessor intended to string tables
 ///
 /// For example:
 /// ```

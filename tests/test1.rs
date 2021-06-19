@@ -293,7 +293,7 @@ fn write_read_le_64() -> io::Result<()> {
 }
 
 #[test]
-fn read_be_ppc() -> io::Result<()> {
+fn read_be_ppc32() -> io::Result<()> {
     let elf_file = File::open("tests/files/hello_ppc")?;
     let mut reader = BufReader::new(elf_file);
 

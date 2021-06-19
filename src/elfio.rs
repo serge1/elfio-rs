@@ -78,6 +78,7 @@ mod header;
 mod section;
 mod segment;
 mod strings;
+mod symbols;
 mod types;
 mod utils;
 
@@ -90,6 +91,7 @@ use std::fs::File;
 use std::io;
 use std::io::{prelude::*, BufReader};
 pub use strings::*;
+pub use symbols::*;
 pub use types::*;
 
 /// Elfio - the main struct of the library. All access to ELF files attributes
