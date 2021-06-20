@@ -40,7 +40,7 @@ pub trait ElfSectionAccessTrait {
     ELFIO_GET_SET_ACCESS_DECL!(ElfXword, entry_size);
 
     /// Get section name
-    fn get_name(&self) -> &String;
+    fn get_name(&self) -> &str;
     /// Set section name
     fn set_name(&mut self, name: &str);
     /// Returns section data
@@ -137,7 +137,7 @@ where
     ELFIO_GET_SET_ACCESS!(ElfXword, addr_align, sh_addralign);
     ELFIO_GET_SET_ACCESS!(ElfXword, entry_size, sh_entsize);
 
-    fn get_name(&self) -> &String {
+    fn get_name(&self) -> &str {
         &self.name
     }
 
