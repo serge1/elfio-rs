@@ -176,9 +176,11 @@ where
         self.sh_addralign.load(reader)?;
         self.sh_entsize.load(reader)?;
 
-        reader.seek(io::SeekFrom::Start(self.get_offset()))?;
         self.data = vec![0; self.get_size().as_()];
-        reader.read_exact(&mut self.data)?;
+        if self.get_type() != SHT_NULL && self.get_type() != SHT_NOBITS {
+            reader.seek(io::SeekFrom::Start(self.get_offset()))?;
+            reader.read_exact(&mut self.data)?;
+        }
 
         Ok(())
     }
