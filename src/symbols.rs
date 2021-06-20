@@ -25,12 +25,12 @@ use super::*;
 /// A section data accessor intended to symbol tables
 pub struct SymbolSectionAccessor<'a> {
     _elfio: &'a Elfio,
-    section: &'a Box<dyn ElfSectionTrait>,
+    section: &'a dyn ElfSectionTrait,
 }
 
 impl<'a> SymbolSectionAccessor<'a> {
     /// Creates a new instance of the symbol table accessor
-    pub fn new(elfio: &'a Elfio, section: &'a Box<dyn ElfSectionTrait>) -> SymbolSectionAccessor<'a> {
+    pub fn new(elfio: &'a Elfio, section: &'a dyn ElfSectionTrait) -> SymbolSectionAccessor<'a> {
         SymbolSectionAccessor { _elfio:elfio, section }
     }
 

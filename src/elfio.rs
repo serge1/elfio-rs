@@ -209,10 +209,10 @@ impl Elfio {
     }
 
     /// Retrieve ELF file section by its name
-    pub fn get_section_by_name(&self, section_name: &str) -> Option<&Box<dyn ElfSectionTrait>> {
+    pub fn get_section_by_name(&self, section_name: &str) -> Option<&dyn ElfSectionTrait> {
         for section in &self.sections {
             if section.get_name() == section_name {
-                return Some(section);
+                return Some(&**section);
             }
         }
 
@@ -235,7 +235,7 @@ impl Elfio {
         if shstrndx != SHN_UNDEF {
             for i in 1..num {
                 let pos = self.sections[i as usize].get_name_string_offset();
-                let acc = StringSectionAccessor::new(&self.sections[shstrndx as usize]);
+                let acc = StringSectionAccessor::new(&*self.sections[shstrndx as usize]);
                 let name = acc.get_string(pos);
                 self.sections[i as usize].set_name(&name);
             }
@@ -324,5 +324,11 @@ impl std::fmt::Debug for Elfio {
             //  .field("x", &self.x)
             //  .field("y", &self.y)
             .finish()
+    }
+}
+
+impl Default for Elfio {
+    fn default() -> Self {
+        Self::new()
     }
 }

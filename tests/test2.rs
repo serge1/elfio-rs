@@ -40,7 +40,7 @@ fn sym_le_32() -> io::Result<()> {
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };
 
-    let symtab = SymbolSectionAccessor::new(&elf, &section);
+    let symtab = SymbolSectionAccessor::new(&elf, &*section);
     assert_eq!(symtab.get_symbols_num(), 0x44);
 
     Ok(())
@@ -60,7 +60,7 @@ fn sym_le_64() -> io::Result<()> {
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };
 
-    let symtab = SymbolSectionAccessor::new(&elf, &section);
+    let symtab = SymbolSectionAccessor::new(&elf, &*section);
     assert_eq!(symtab.get_symbols_num(), 0x43);
 
     Ok(())
@@ -80,7 +80,7 @@ fn sym_be_32() -> io::Result<()> {
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };
 
-    let symtab = SymbolSectionAccessor::new(&elf, &section);
+    let symtab = SymbolSectionAccessor::new(&elf, &*section);
     assert_eq!(symtab.get_symbols_num(), 0x50);
 
     Ok(())
@@ -100,7 +100,7 @@ fn sym_be_64() -> io::Result<()> {
         None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
     };
 
-    let symtab = SymbolSectionAccessor::new(&elf, &section);
+    let symtab = SymbolSectionAccessor::new(&elf, &*section);
     assert_eq!(symtab.get_symbols_num(), 0x19);
 
     Ok(())

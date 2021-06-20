@@ -59,12 +59,12 @@ trait StringSectionAccessorTrait {
 /// ```
 
 pub struct StringSectionAccessor<'a> {
-    section: &'a Box<dyn ElfSectionTrait>,
+    section: &'a dyn ElfSectionTrait,
 }
 
 impl<'a> StringSectionAccessor<'a> {
     /// Creates a new instance of the string table accessor
-    pub fn new(section: &'a Box<dyn ElfSectionTrait>) -> StringSectionAccessor<'a> {
+    pub fn new(section: &'a dyn ElfSectionTrait) -> StringSectionAccessor<'a> {
         StringSectionAccessor { section }
     }
 

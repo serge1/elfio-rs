@@ -178,7 +178,7 @@ where
 
         reader.seek(io::SeekFrom::Start(self.get_offset()))?;
         self.data = vec![0; self.get_size().as_()];
-        reader.read(&mut self.data)?;
+        reader.read_exact(&mut self.data)?;
 
         Ok(())
     }
