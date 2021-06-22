@@ -102,9 +102,8 @@ impl<'a> SymbolSectionAccessor<'a> {
             );
             sym.st_info = symbol_area[4];
             sym.st_other = symbol_area[5];
-            sym.st_shndx = u16::from_ne_bytes(
-                <[u8; 2]>::try_from(&symbol_area[6..8]).unwrap_or([0u8, 0u8]),
-            );
+            sym.st_shndx =
+                u16::from_ne_bytes(<[u8; 2]>::try_from(&symbol_area[6..8]).unwrap_or([0u8, 0u8]));
             sym.st_value = u64::from_ne_bytes(
                 <[u8; 8]>::try_from(&symbol_area[8..16])
                     .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
@@ -114,14 +113,14 @@ impl<'a> SymbolSectionAccessor<'a> {
                     .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
             );
 
-            return Some(Symbol {
+            Some(Symbol {
                 name: "".to_string(),
                 value: sym.st_value,
                 size: sym.st_size,
                 info: sym.st_info,
                 other: sym.st_other,
                 shndx: sym.st_shndx,
-            });
+            })
         } else {
             let mut sym = Elf32Sym {
                 st_name: 0,
@@ -148,15 +147,14 @@ impl<'a> SymbolSectionAccessor<'a> {
                 <[u8; 2]>::try_from(&symbol_area[offset + 14..offset + 16]).unwrap_or([0u8, 0u8]),
             );
 
-            return Some(Symbol {
+            Some(Symbol {
                 name: "".to_string(),
                 value: sym.st_value as u64,
                 size: sym.st_size as u64,
                 info: sym.st_info,
                 other: sym.st_other,
                 shndx: sym.st_shndx,
-            });
-        };
+            })
+        }
     }
 }
-// 33: 0000000000400410     0 FUNC    LOCAL  DEFAULT   12 __do_global_dtors_aux

@@ -37,7 +37,7 @@ fn sym_le_32() -> io::Result<()> {
 
     let section = match elf.get_section_by_name(&".symtab") {
         Some(s) => s,
-        None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
     };
 
     let symtab = SymbolSectionAccessor::new(&elf, &*section);
@@ -57,13 +57,14 @@ fn sym_le_64() -> io::Result<()> {
 
     let section = match elf.get_section_by_name(&".symtab") {
         Some(s) => s,
-        None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
     };
 
     let symtab = SymbolSectionAccessor::new(&elf, &*section);
     assert_eq!(symtab.get_symbols_num(), 0x43);
 
     let sym = symtab.get_symbol(33).unwrap();
+    // 33: 0000000000400410     0 FUNC    LOCAL  DEFAULT   12 __do_global_dtors_aux
     assert_eq!(sym.value, 0x400410);
     assert_eq!(sym.size, 0);
     assert_eq!(sym.shndx, 12);
@@ -82,7 +83,7 @@ fn sym_be_32() -> io::Result<()> {
 
     let section = match elf.get_section_by_name(&".symtab") {
         Some(s) => s,
-        None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
     };
 
     let symtab = SymbolSectionAccessor::new(&elf, &*section);
@@ -102,7 +103,7 @@ fn sym_be_64() -> io::Result<()> {
 
     let section = match elf.get_section_by_name(&".dynsym") {
         Some(s) => s,
-        None => return Err(Error::new(io::ErrorKind::Other, "section not found"))
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
     };
 
     let symtab = SymbolSectionAccessor::new(&elf, &*section);
