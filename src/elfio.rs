@@ -115,7 +115,7 @@ impl Elfio {
             converter: utils::Converter { is_needed: false },
             header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
             sections: Vec::new(),
-            segments: Vec::new(),
+            segments: Vec::new()
         }
     }
 

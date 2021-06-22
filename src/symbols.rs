@@ -21,25 +21,142 @@ THE SOFTWARE.
 */
 
 use super::*;
+use std::convert::TryFrom;
+
+/// A struct represents a single symbol from symbol table section
+pub struct Symbol {
+    /// The name of the associated symbol
+    pub name: String,
+    /// The value of the associated symbol
+    pub value: Elf64Addr,
+    /// The symbol's associated size
+    pub size: ElfXword,
+    /// This member specifies the symbol's type and binding attributes
+    pub info: u8,
+    /// This member specifies a symbol's visibility
+    pub other: u8,
+    /// Every symbol table entry is defined in relation to some section.
+    /// This member holds the relevant section header table index.
+    pub shndx: ElfHalf,
+}
+
+struct Elf32Sym {
+    st_name: ElfWord,
+    st_value: Elf32Addr,
+    st_size: ElfWord,
+    st_info: u8,
+    st_other: u8,
+    st_shndx: ElfHalf,
+}
+
+struct Elf64Sym {
+    st_name: ElfWord,
+    st_info: u8,
+    st_other: u8,
+    st_shndx: ElfHalf,
+    st_value: Elf64Addr,
+    st_size: ElfXword,
+}
 
 /// A section data accessor intended to symbol tables
 pub struct SymbolSectionAccessor<'a> {
-    _elfio: &'a Elfio,
+    elfio: &'a Elfio,
     section: &'a dyn ElfSectionTrait,
 }
 
 impl<'a> SymbolSectionAccessor<'a> {
     /// Creates a new instance of the symbol table accessor
     pub fn new(elfio: &'a Elfio, section: &'a dyn ElfSectionTrait) -> SymbolSectionAccessor<'a> {
-        SymbolSectionAccessor { _elfio:elfio, section }
+        SymbolSectionAccessor { elfio, section }
     }
 
-    /// Returns number of symbols 
+    /// Returns number of symbols
     pub fn get_symbols_num(&self) -> ElfXword {
         if self.section.get_entry_size() != 0 {
-            return self.section.get_size() / self.section.get_entry_size()
+            return self.section.get_size() / self.section.get_entry_size();
         }
 
         0
     }
+
+    /// Get a symbol by its index
+    pub fn get_symbol(&self, index: ElfXword) -> Option<Symbol> {
+        if index > self.get_symbols_num() - 1 {
+            return None;
+        }
+        let offset: usize = (index * self.section.get_entry_size()) as usize;
+        let end: usize = offset + self.section.get_entry_size() as usize;
+        let symbol_area = &self.section.get_data()[offset..end];
+
+        if self.elfio.get_class() == ELFCLASS64 {
+            let mut sym = Elf64Sym {
+                st_name: 0,
+                st_info: 0,
+                st_other: 0,
+                st_shndx: 0,
+                st_value: 0,
+                st_size: 0,
+            };
+            sym.st_name = u32::from_ne_bytes(
+                <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+            );
+            sym.st_info = symbol_area[4];
+            sym.st_other = symbol_area[5];
+            sym.st_shndx = u16::from_ne_bytes(
+                <[u8; 2]>::try_from(&symbol_area[6..8]).unwrap_or([0u8, 0u8]),
+            );
+            sym.st_value = u64::from_ne_bytes(
+                <[u8; 8]>::try_from(&symbol_area[8..16])
+                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+            );
+            sym.st_size = u64::from_ne_bytes(
+                <[u8; 8]>::try_from(&symbol_area[16..24])
+                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+            );
+
+            return Some(Symbol {
+                name: "".to_string(),
+                value: sym.st_value,
+                size: sym.st_size,
+                info: sym.st_info,
+                other: sym.st_other,
+                shndx: sym.st_shndx,
+            });
+        } else {
+            let mut sym = Elf32Sym {
+                st_name: 0,
+                st_info: 0,
+                st_other: 0,
+                st_shndx: 0,
+                st_value: 0,
+                st_size: 0,
+            };
+            sym.st_name = u32::from_ne_bytes(
+                <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+            );
+            sym.st_value = u32::from_ne_bytes(
+                <[u8; 4]>::try_from(&symbol_area[offset + 4..offset + 8])
+                    .unwrap_or([0u8, 0u8, 0u8, 0u8]),
+            );
+            sym.st_size = u32::from_ne_bytes(
+                <[u8; 4]>::try_from(&symbol_area[offset + 8..offset + 12])
+                    .unwrap_or([0u8, 0u8, 0u8, 0u8]),
+            );
+            sym.st_info = symbol_area[offset + 12];
+            sym.st_other = symbol_area[offset + 13];
+            sym.st_shndx = u16::from_ne_bytes(
+                <[u8; 2]>::try_from(&symbol_area[offset + 14..offset + 16]).unwrap_or([0u8, 0u8]),
+            );
+
+            return Some(Symbol {
+                name: "".to_string(),
+                value: sym.st_value as u64,
+                size: sym.st_size as u64,
+                info: sym.st_info,
+                other: sym.st_other,
+                shndx: sym.st_shndx,
+            });
+        };
+    }
 }
+// 33: 0000000000400410     0 FUNC    LOCAL  DEFAULT   12 __do_global_dtors_aux

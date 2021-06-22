@@ -63,6 +63,11 @@ fn sym_le_64() -> io::Result<()> {
     let symtab = SymbolSectionAccessor::new(&elf, &*section);
     assert_eq!(symtab.get_symbols_num(), 0x43);
 
+    let sym = symtab.get_symbol(33).unwrap();
+    assert_eq!(sym.value, 0x400410);
+    assert_eq!(sym.size, 0);
+    assert_eq!(sym.shndx, 12);
+
     Ok(())
 }
 

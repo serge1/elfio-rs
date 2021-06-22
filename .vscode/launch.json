@@ -78,6 +78,25 @@
             },
             "args": [],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'test2'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=test2",
+                    "--package=elfio"
+                ],
+                "filter": {
+                    "name": "test2",
+                    "kind": "test"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
