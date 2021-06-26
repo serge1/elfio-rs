@@ -42,6 +42,12 @@ fn sym_le_32() -> io::Result<()> {
 
     let symtab = SymbolSectionAccessor::new(&elf, &*section);
     assert_eq!(symtab.get_symbols_num(), 0x44);
+    // Num:    Value  Size Type    Bind   Vis      Ndx Name
+    //  30: 08049588     4 OBJECT  LOCAL  DEFAULT   23 dtor_idx.5805
+    let sym = symtab.get_symbol(30).unwrap();
+    assert_eq!(sym.value, 0x08049588);
+    assert_eq!(sym.size, 4);
+    assert_eq!(sym.shndx, 23);
 
     Ok(())
 }
