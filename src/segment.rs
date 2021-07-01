@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 use super::utils::*;
 use super::*;
-use num::{cast::AsPrimitive, Zero};
+use num_traits::{AsPrimitive, Zero};
 
 // --------------------------------------------------------------------------
 /// Read/Write access to segment properties
@@ -60,11 +60,9 @@ pub struct ElfSegment<Addr, Offset, Word> {
 // --------------------------------------------------------------------------
 impl<Addr, Offset, Word> ElfSegment<Addr, Offset, Word>
 where
-    u32: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
-    u64: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
+    Word: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
     pub fn new(conv: &Converter, class: u8) -> ElfSegment<Addr, Offset, Word> {
@@ -89,9 +87,9 @@ impl<Addr, Offset, Word> ElfSegmentTrait for ElfSegment<Addr, Offset, Word>
 where
     u32: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
     u64: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
+    Word: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
 }
@@ -101,9 +99,9 @@ impl<Addr, Offset, Word> ElfSegmentAccessTrait for ElfSegment<Addr, Offset, Word
 where
     u32: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
     u64: AsPrimitive<Addr> + AsPrimitive<Offset> + AsPrimitive<Word>,
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
+    Word: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
     ELFIO_GET_SET_ACCESS!(ElfWord, type, p_type);
@@ -119,9 +117,9 @@ where
 // --------------------------------------------------------------------------
 impl<Addr, Offset, Word> Load for ElfSegment<Addr, Offset, Word>
 where
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Word: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
+    Word: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {

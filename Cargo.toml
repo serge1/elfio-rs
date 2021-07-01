@@ -12,4 +12,4 @@ path = "src/elfio.rs"
 
 [dependencies]
 paste = "1.0.5"
-num = "0.4.0"
+num-traits = "0.2"

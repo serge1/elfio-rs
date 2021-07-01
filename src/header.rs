@@ -20,11 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-extern crate num;
+extern crate num_traits;
 
 use super::utils::*;
 use super::*;
-use num::{cast::AsPrimitive, Zero};
+use num_traits::*;
 use std::fs::File;
 use std::io::BufReader;
 
@@ -82,10 +82,8 @@ pub struct ElfHeader<Addr, Offset> {
 // --------------------------------------------------------------------------
 impl<Addr, Offset> ElfHeader<Addr, Offset>
 where
-    u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
-    u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset>,
 {
     pub fn new() -> ElfHeader<Addr, Offset> {
@@ -132,8 +130,8 @@ impl<Addr, Offset> ElfHeaderTrait for ElfHeader<Addr, Offset>
 where
     u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
     u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset>,
 {
 }
@@ -143,8 +141,8 @@ impl<Addr, Offset> ElfHeaderAccessTrait for ElfHeader<Addr, Offset>
 where
     u32: AsPrimitive<Addr> + AsPrimitive<Offset>,
     u64: AsPrimitive<Addr> + AsPrimitive<Offset>,
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset>,
 {
     ELFIO_GET_ACCESS!(u8, class, e_ident[EI_CLASS]);
@@ -175,8 +173,8 @@ where
 // --------------------------------------------------------------------------
 impl<Addr, Offset> Load for ElfHeader<Addr, Offset>
 where
-    Addr: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
-    Offset: Zero + Load + AsPrimitive<u32> + AsPrimitive<u64>,
+    Addr: Zero + Load + AsPrimitive<u64>,
+    Offset: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset>,
 {
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {

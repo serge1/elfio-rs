@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use num::cast::AsPrimitive;
+use num_traits::AsPrimitive;
 use std::fs::File;
 use std::io;
 use std::io::{BufReader, Read};
@@ -83,7 +83,7 @@ impl Load for &mut [u8; 16] {
 // --------------------------------------------------------------------------
 pub trait Convert<T>
 where
-    T: AsPrimitive<u32> + AsPrimitive<u64>,
+    T: AsPrimitive<u64>,
 {
     fn convert(&self, value: T) -> T;
 }
