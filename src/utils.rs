@@ -26,51 +26,31 @@ use std::io;
 use std::io::{BufReader, Read};
 
 // --------------------------------------------------------------------------
+macro_rules! impl_load_for {
+    ( $x:ty ) => {
+        impl Load for $x {
+            fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+                let mut buffer = self.to_ne_bytes();
+                reader.read_exact(&mut buffer)?;
+                *self = <$x>::from_ne_bytes(buffer);
+
+                Ok(())
+            }
+        }
+    };
+}
+
+// --------------------------------------------------------------------------
 /// The trait for (de)serializing ELF entities
 pub trait Load {
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()>;
 }
 
 // --------------------------------------------------------------------------
-impl Load for u8 {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
-        let mut buffer = self.to_ne_bytes();
-        reader.read_exact(&mut buffer)?;
-        *self = u8::from_ne_bytes(buffer);
-
-        Ok(())
-    }
-}
-
-impl Load for u16 {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
-        let mut buffer = self.to_ne_bytes();
-        reader.read_exact(&mut buffer)?;
-        *self = u16::from_ne_bytes(buffer);
-
-        Ok(())
-    }
-}
-
-impl Load for u32 {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
-        let mut buffer = self.to_ne_bytes();
-        reader.read_exact(&mut buffer)?;
-        *self = u32::from_ne_bytes(buffer);
-
-        Ok(())
-    }
-}
-
-impl Load for u64 {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
-        let mut buffer = self.to_ne_bytes();
-        reader.read_exact(&mut buffer)?;
-        *self = u64::from_ne_bytes(buffer);
-
-        Ok(())
-    }
-}
+impl_load_for!(u8);
+impl_load_for!(u16);
+impl_load_for!(u32);
+impl_load_for!(u64);
 
 impl Load for &mut [u8; 16] {
     fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
@@ -81,6 +61,32 @@ impl Load for &mut [u8; 16] {
 }
 
 // --------------------------------------------------------------------------
+macro_rules! impl_convert_for {
+    ( $x:ty ) => {
+        #[cfg(target_endian = "little")]
+        impl Convert<$x> for Converter {
+            fn convert(&self, value: $x) -> $x {
+                if self.is_needed {
+                    value.to_be()
+                } else {
+                    value
+                }
+            }
+        }
+        #[cfg(target_endian = "big")]
+        impl Convert<$x> for Converter {
+            fn convert(&self, value: $x) -> $x {
+                if self.is_needed {
+                    value.to_le()
+                } else {
+                    value
+                }
+            }
+        }
+    };
+}
+
+// --------------------------------------------------------------------------
 pub trait Convert<T>
 where
     T: AsPrimitive<u64>,
@@ -88,83 +94,18 @@ where
     fn convert(&self, value: T) -> T;
 }
 
+// --------------------------------------------------------------------------
 #[derive(Debug, Copy, Clone)]
 pub struct Converter {
     pub is_needed: bool,
 }
 
 // --------------------------------------------------------------------------
-impl Convert<u8> for Converter {
-    fn convert(&self, value: u8) -> u8 {
-        value
-    }
-}
+impl_convert_for!(u8);
+impl_convert_for!(u16);
+impl_convert_for!(u32);
+impl_convert_for!(u64);
 
-#[cfg(target_endian = "little")]
-impl Convert<u16> for Converter {
-    fn convert(&self, value: u16) -> u16 {
-        if self.is_needed {
-            value.to_be()
-        } else {
-            value
-        }
-    }
-}
-
-#[cfg(target_endian = "little")]
-impl Convert<u32> for Converter {
-    fn convert(&self, value: u32) -> u32 {
-        if self.is_needed {
-            value.to_be()
-        } else {
-            value
-        }
-    }
-}
-
-#[cfg(target_endian = "little")]
-impl Convert<u64> for Converter {
-    fn convert(&self, value: u64) -> u64 {
-        if self.is_needed {
-            value.to_be()
-        } else {
-            value
-        }
-    }
-}
-
-#[cfg(target_endian = "big")]
-impl Convert<u16> for Converter {
-    fn convert(&self, value: u16) -> u16 {
-        if self.is_needed {
-            value.to_le()
-        } else {
-            value
-        }
-    }
-}
-
-#[cfg(target_endian = "big")]
-impl Convert<u32> for Converter {
-    fn convert(&self, value: u32) -> u32 {
-        if self.is_needed {
-            value.to_le()
-        } else {
-            value
-        }
-    }
-}
-
-#[cfg(target_endian = "big")]
-impl Convert<u64> for Converter {
-    fn convert(&self, value: u64) -> u64 {
-        if self.is_needed {
-            value.to_le()
-        } else {
-            value
-        }
-    }
-}
 
 // --------------------------------------------------------------------------
 #[test]
