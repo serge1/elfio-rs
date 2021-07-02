@@ -87,12 +87,11 @@ pub use section::ElfSectionAccessTrait;
 use section::*;
 pub use segment::ElfSegmentAccessTrait;
 use segment::*;
-use std::fs::File;
 use std::io;
-use std::io::{prelude::*, BufReader};
 pub use strings::*;
 pub use symbols::*;
 pub use types::*;
+pub use utils::ElfioReadSeek;
 
 /// Elfio - the main struct of the library. All access to ELF files attributes
 /// starts from this object.
@@ -115,7 +114,7 @@ impl Elfio {
             converter: utils::Converter { is_needed: false },
             header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
             sections: Vec::new(),
-            segments: Vec::new()
+            segments: Vec::new(),
         }
     }
 
@@ -140,7 +139,7 @@ impl Elfio {
     }
 
     /// Load the ELF file from input stream
-    pub fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+    pub fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
         // Read ELF file signature
         reader.read_exact(&mut e_ident)?;
@@ -219,7 +218,7 @@ impl Elfio {
         None
     }
 
-    fn load_sections(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+    fn load_sections(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         let entry_size = self.header.get_section_entry_size() as Elf64Off;
         let num = self.header.get_sections_num() as Elf64Off;
         let offset = self.header.get_sections_offset();
@@ -266,7 +265,7 @@ impl Elfio {
         section
     }
 
-    fn load_segments(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+    fn load_segments(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         let entry_size = self.header.get_segment_entry_size() as Elf64Off;
         let num = self.header.get_segments_num() as Elf64Off;
         let offset = self.header.get_segments_offset();

@@ -25,8 +25,6 @@ extern crate num_traits;
 use super::utils::*;
 use super::*;
 use num_traits::*;
-use std::fs::File;
-use std::io::BufReader;
 
 // --------------------------------------------------------------------------
 pub trait ElfHeaderAccessTrait {
@@ -177,7 +175,7 @@ where
     Offset: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset>,
 {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+    fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         (&mut self.e_ident).load(reader)?;
         self.e_type.load(reader)?;
         self.e_machine.load(reader)?;

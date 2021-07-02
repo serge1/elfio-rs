@@ -162,7 +162,7 @@ where
     Word: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+    fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         self.sh_name.load(reader)?;
         self.sh_type.load(reader)?;
         self.sh_flags.load(reader)?;

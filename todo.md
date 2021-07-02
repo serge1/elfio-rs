@@ -24,3 +24,4 @@
 - Implement Segment Trait and Struct
 - Implement data access for sections and segments
 - Implement string table section accessor
+- All 'load' functions accept a generic ElfioReadSeek parameter for file/memory access

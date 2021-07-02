@@ -24,7 +24,7 @@ use std::fs::File;
 use std::io;
 use std::io::{BufReader, Error};
 
-use elfio::{Elfio, SymbolSectionAccessor};
+use elfio::*;
 
 #[test]
 fn sym_le_32() -> io::Result<()> {

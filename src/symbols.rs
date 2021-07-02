@@ -134,18 +134,15 @@ impl<'a> SymbolSectionAccessor<'a> {
                 <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
             );
             sym.st_value = u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&symbol_area[4..8])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                <[u8; 4]>::try_from(&symbol_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
             );
             sym.st_size = u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&symbol_area[8..12])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                <[u8; 4]>::try_from(&symbol_area[8..12]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
             );
             sym.st_info = symbol_area[12];
             sym.st_other = symbol_area[13];
-            sym.st_shndx = u16::from_ne_bytes(
-                <[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]),
-            );
+            sym.st_shndx =
+                u16::from_ne_bytes(<[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]));
 
             Some(Symbol {
                 name: "".to_string(),

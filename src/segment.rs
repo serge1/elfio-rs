@@ -122,7 +122,7 @@ where
     Word: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset> + Convert<Word>,
 {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+    fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         self.p_type.load(reader)?;
         if self.class == ELFCLASS64 {
             self.p_flags.load(reader)?;

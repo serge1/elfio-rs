@@ -21,15 +21,14 @@ THE SOFTWARE.
 */
 
 use num_traits::AsPrimitive;
-use std::fs::File;
 use std::io;
-use std::io::{BufReader, Read};
+use std::io::{Read, Seek};
 
 // --------------------------------------------------------------------------
 macro_rules! impl_load_for {
     ( $x:ty ) => {
         impl Load for $x {
-            fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+            fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
                 let mut buffer = self.to_ne_bytes();
                 reader.read_exact(&mut buffer)?;
                 *self = <$x>::from_ne_bytes(buffer);
@@ -41,9 +40,18 @@ macro_rules! impl_load_for {
 }
 
 // --------------------------------------------------------------------------
+/// A trait for reading ELF file payload from a file or memory.
+/// Currently, it is implemented for std::fs::File, std::io::BufReader
+/// and std::io::Cursor
+pub trait ElfioReadSeek: Read + Seek {}
+impl ElfioReadSeek for std::fs::File {}
+impl<T: Read + Seek> ElfioReadSeek for std::io::BufReader<T> {}
+impl<T: Read + Seek + AsRef<[u8]>> ElfioReadSeek for std::io::Cursor<T> {}
+
+// --------------------------------------------------------------------------
 /// The trait for (de)serializing ELF entities
 pub trait Load {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()>;
+    fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()>;
 }
 
 // --------------------------------------------------------------------------
@@ -53,7 +61,7 @@ impl_load_for!(u32);
 impl_load_for!(u64);
 
 impl Load for &mut [u8; 16] {
-    fn load(&mut self, reader: &mut BufReader<File>) -> io::Result<()> {
+    fn load(&mut self, reader: &mut dyn ElfioReadSeek) -> io::Result<()> {
         reader.read_exact(*self)?;
 
         Ok(())
@@ -105,7 +113,6 @@ impl_convert_for!(u8);
 impl_convert_for!(u16);
 impl_convert_for!(u32);
 impl_convert_for!(u64);
-
 
 // --------------------------------------------------------------------------
 #[test]
