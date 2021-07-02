@@ -24,6 +24,8 @@ use super::*;
 use std::convert::TryFrom;
 
 /// A struct represents a single symbol from symbol table section
+#[repr(C)]
+#[derive(Debug, Default)]
 pub struct Symbol {
     /// The name of the associated symbol
     pub name:  String,
@@ -40,6 +42,7 @@ pub struct Symbol {
     pub shndx: ElfHalf,
 }
 
+#[derive (Default)]
 struct Elf32Sym {
     st_name:  ElfWord,
     st_value: Elf32Addr,
@@ -49,6 +52,7 @@ struct Elf32Sym {
     st_shndx: ElfHalf,
 }
 
+#[derive (Default)]
 struct Elf64Sym {
     st_name:  ElfWord,
     st_info:  u8,
@@ -89,14 +93,7 @@ impl<'a> SymbolSectionAccessor<'a> {
         let symbol_area = &self.section.get_data()[offset..end];
 
         if self.elfio.get_class() == ELFCLASS64 {
-            let mut sym = Elf64Sym {
-                st_name:  0,
-                st_info:  0,
-                st_other: 0,
-                st_shndx: 0,
-                st_value: 0,
-                st_size:  0,
-            };
+            let mut sym: Elf64Sym = Default::default();
             sym.st_name = u32::from_ne_bytes(
                 <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
             );
@@ -114,7 +111,7 @@ impl<'a> SymbolSectionAccessor<'a> {
             );
 
             Some(Symbol {
-                name:  "".to_string(),
+                name:  sym.st_name.to_string(),
                 value: sym.st_value,
                 size:  sym.st_size,
                 info:  sym.st_info,
@@ -122,14 +119,7 @@ impl<'a> SymbolSectionAccessor<'a> {
                 shndx: sym.st_shndx,
             })
         } else {
-            let mut sym = Elf32Sym {
-                st_name:  0,
-                st_info:  0,
-                st_other: 0,
-                st_shndx: 0,
-                st_value: 0,
-                st_size:  0,
-            };
+            let mut sym: Elf32Sym = Default::default();
             sym.st_name = u32::from_ne_bytes(
                 <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
             );
@@ -145,7 +135,7 @@ impl<'a> SymbolSectionAccessor<'a> {
                 u16::from_ne_bytes(<[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]));
 
             Some(Symbol {
-                name:  "".to_string(),
+                name:  sym.st_name.to_string(),
                 value: sym.st_value as u64,
                 size:  sym.st_size as u64,
                 info:  sym.st_info,

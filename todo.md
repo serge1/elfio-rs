@@ -3,6 +3,7 @@
 ## Not yet done
 
 - Implement symbol table section accessor
+- Implement Debug for Elfio
 - Decide regarding template args. Maybe a single param is enough
 
 ## Done
