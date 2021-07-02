@@ -26,13 +26,13 @@ use std::convert::TryFrom;
 /// A struct represents a single symbol from symbol table section
 pub struct Symbol {
     /// The name of the associated symbol
-    pub name: String,
+    pub name:  String,
     /// The value of the associated symbol
     pub value: Elf64Addr,
     /// The symbol's associated size
-    pub size: ElfXword,
+    pub size:  ElfXword,
     /// This member specifies the symbol's type and binding attributes
-    pub info: u8,
+    pub info:  u8,
     /// This member specifies a symbol's visibility
     pub other: u8,
     /// Every symbol table entry is defined in relation to some section.
@@ -41,26 +41,26 @@ pub struct Symbol {
 }
 
 struct Elf32Sym {
-    st_name: ElfWord,
+    st_name:  ElfWord,
     st_value: Elf32Addr,
-    st_size: ElfWord,
-    st_info: u8,
+    st_size:  ElfWord,
+    st_info:  u8,
     st_other: u8,
     st_shndx: ElfHalf,
 }
 
 struct Elf64Sym {
-    st_name: ElfWord,
-    st_info: u8,
+    st_name:  ElfWord,
+    st_info:  u8,
     st_other: u8,
     st_shndx: ElfHalf,
     st_value: Elf64Addr,
-    st_size: ElfXword,
+    st_size:  ElfXword,
 }
 
 /// A section data accessor intended to symbol tables
 pub struct SymbolSectionAccessor<'a> {
-    elfio: &'a Elfio,
+    elfio:   &'a Elfio,
     section: &'a dyn ElfSectionTrait,
 }
 
@@ -90,12 +90,12 @@ impl<'a> SymbolSectionAccessor<'a> {
 
         if self.elfio.get_class() == ELFCLASS64 {
             let mut sym = Elf64Sym {
-                st_name: 0,
-                st_info: 0,
+                st_name:  0,
+                st_info:  0,
                 st_other: 0,
                 st_shndx: 0,
                 st_value: 0,
-                st_size: 0,
+                st_size:  0,
             };
             sym.st_name = u32::from_ne_bytes(
                 <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
@@ -114,21 +114,21 @@ impl<'a> SymbolSectionAccessor<'a> {
             );
 
             Some(Symbol {
-                name: "".to_string(),
+                name:  "".to_string(),
                 value: sym.st_value,
-                size: sym.st_size,
-                info: sym.st_info,
+                size:  sym.st_size,
+                info:  sym.st_info,
                 other: sym.st_other,
                 shndx: sym.st_shndx,
             })
         } else {
             let mut sym = Elf32Sym {
-                st_name: 0,
-                st_info: 0,
+                st_name:  0,
+                st_info:  0,
                 st_other: 0,
                 st_shndx: 0,
                 st_value: 0,
-                st_size: 0,
+                st_size:  0,
             };
             sym.st_name = u32::from_ne_bytes(
                 <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
@@ -145,10 +145,10 @@ impl<'a> SymbolSectionAccessor<'a> {
                 u16::from_ne_bytes(<[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]));
 
             Some(Symbol {
-                name: "".to_string(),
+                name:  "".to_string(),
                 value: sym.st_value as u64,
-                size: sym.st_size as u64,
-                info: sym.st_info,
+                size:  sym.st_size as u64,
+                info:  sym.st_info,
                 other: sym.st_other,
                 shndx: sym.st_shndx,
             })

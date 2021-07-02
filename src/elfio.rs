@@ -100,10 +100,10 @@ pub use utils::ElfioReadSeek;
 
 // --------------------------------------------------------------------------
 pub struct Elfio {
-    header: Box<dyn ElfHeaderTrait>,
+    header:    Box<dyn ElfHeaderTrait>,
     converter: utils::Converter,
-    sections: Vec<Box<dyn ElfSectionTrait>>,
-    segments: Vec<Box<dyn ElfSegmentTrait>>,
+    sections:  Vec<Box<dyn ElfSectionTrait>>,
+    segments:  Vec<Box<dyn ElfSegmentTrait>>,
 }
 
 // --------------------------------------------------------------------------
@@ -112,9 +112,9 @@ impl Elfio {
     pub fn new() -> Self {
         Elfio {
             converter: utils::Converter { is_needed: false },
-            header: Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
-            sections: Vec::new(),
-            segments: Vec::new(),
+            header:    Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
+            sections:  Vec::new(),
+            segments:  Vec::new(),
         }
     }
 
@@ -128,13 +128,13 @@ impl Elfio {
             } else {
                 utils::Converter { is_needed: true }
             },
-            header: if encoding == ELFCLASS64 {
+            header:    if encoding == ELFCLASS64 {
                 Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new())
             } else {
                 Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new())
             },
-            sections: Vec::new(),
-            segments: Vec::new(),
+            sections:  Vec::new(),
+            segments:  Vec::new(),
         }
     }
 

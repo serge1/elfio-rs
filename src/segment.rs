@@ -44,17 +44,16 @@ pub trait ElfSegmentTrait: ElfSegmentAccessTrait + Load {}
 // ELF file header
 #[repr(C)]
 pub struct ElfSegment<Addr, Offset, Word> {
-    p_type: ElfWord,
-    p_flags: ElfWord,
-    p_offset: Offset,
-    p_vaddr: Addr,
-    p_paddr: Addr,
-    p_filesz: Word,
-    p_memsz: Word,
-    p_align: Word,
-
+    p_type:    ElfWord,
+    p_flags:   ElfWord,
+    p_offset:  Offset,
+    p_vaddr:   Addr,
+    p_paddr:   Addr,
+    p_filesz:  Word,
+    p_memsz:   Word,
+    p_align:   Word,
     converter: Converter,
-    class: u8,
+    class:     u8,
 }
 
 // --------------------------------------------------------------------------
@@ -69,7 +68,6 @@ where
         Self {
             converter: *conv,
             class,
-
             p_type: 0,
             p_flags: 0,
             p_offset: Offset::zero(),

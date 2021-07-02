@@ -57,20 +57,19 @@ pub trait ElfSectionTrait: ElfSectionAccessTrait + Load {}
 #[repr(C)]
 #[derive(Debug)]
 pub struct ElfSection<Addr, Offset, Word> {
-    sh_name: ElfWord,
-    sh_type: ElfWord,
-    sh_flags: Word,
-    sh_addr: Addr,
-    sh_offset: Offset,
-    sh_size: Word,
-    sh_link: ElfWord,
-    sh_info: ElfWord,
+    sh_name:      ElfWord,
+    sh_type:      ElfWord,
+    sh_flags:     Word,
+    sh_addr:      Addr,
+    sh_offset:    Offset,
+    sh_size:      Word,
+    sh_link:      ElfWord,
+    sh_info:      ElfWord,
     sh_addralign: Word,
-    sh_entsize: Word,
-
-    name: String,
-    converter: Converter,
-    data: Vec<u8>,
+    sh_entsize:   Word,
+    name:         String,
+    converter:    Converter,
+    data:         Vec<u8>,
 }
 
 // --------------------------------------------------------------------------
@@ -83,20 +82,19 @@ where
 {
     pub fn new(conv: &Converter) -> ElfSection<Addr, Offset, Word> {
         Self {
-            converter: *conv,
-            name: String::from(""),
-            data: Vec::new(),
-
-            sh_name: 0,
-            sh_type: 0,
-            sh_flags: Word::zero(),
-            sh_addr: Addr::zero(),
-            sh_offset: Offset::zero(),
-            sh_size: Word::zero(),
-            sh_link: 0,
-            sh_info: 0,
+            converter:    *conv,
+            name:         String::from(""),
+            data:         Vec::new(),
+            sh_name:      0,
+            sh_type:      0,
+            sh_flags:     Word::zero(),
+            sh_addr:      Addr::zero(),
+            sh_offset:    Offset::zero(),
+            sh_size:      Word::zero(),
+            sh_link:      0,
+            sh_info:      0,
             sh_addralign: Word::zero(),
-            sh_entsize: Word::zero(),
+            sh_entsize:   Word::zero(),
         }
     }
 }

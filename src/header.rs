@@ -59,20 +59,20 @@ pub trait ElfHeaderTrait: ElfHeaderAccessTrait + Load {}
 #[repr(C)]
 #[derive(Debug)]
 pub struct ElfHeader<Addr, Offset> {
-    e_ident: [u8; EI_NIDENT],
-    e_type: ElfHalf,
-    e_machine: ElfHalf,
-    e_version: ElfWord,
-    e_entry: Addr,
-    e_phoff: Offset,
-    e_shoff: Offset,
-    e_flags: ElfWord,
-    e_ehsize: ElfHalf,
+    e_ident:     [u8; EI_NIDENT],
+    e_type:      ElfHalf,
+    e_machine:   ElfHalf,
+    e_version:   ElfWord,
+    e_entry:     Addr,
+    e_phoff:     Offset,
+    e_shoff:     Offset,
+    e_flags:     ElfWord,
+    e_ehsize:    ElfHalf,
     e_phentsize: ElfHalf,
-    e_phnum: ElfHalf,
+    e_phnum:     ElfHalf,
     e_shentsize: ElfHalf,
-    e_shnum: ElfHalf,
-    e_shstrndx: ElfHalf,
+    e_shnum:     ElfHalf,
+    e_shstrndx:  ElfHalf,
 
     converter: Converter,
 }
@@ -88,7 +88,7 @@ where
         ElfHeader::<Addr, Offset> {
             converter: Converter { is_needed: false },
 
-            e_ident: [
+            e_ident:     [
                 ELFMAG0,
                 ELFMAG1,
                 ELFMAG2,
@@ -106,19 +106,19 @@ where
                 0,
                 0,
             ],
-            e_type: 0,
-            e_machine: 0,
-            e_version: 0,
-            e_entry: Addr::zero(),
-            e_phoff: Offset::zero(),
-            e_shoff: Offset::zero(),
-            e_flags: 0,
-            e_ehsize: 0,
+            e_type:      0,
+            e_machine:   0,
+            e_version:   0,
+            e_entry:     Addr::zero(),
+            e_phoff:     Offset::zero(),
+            e_shoff:     Offset::zero(),
+            e_flags:     0,
+            e_ehsize:    0,
             e_phentsize: 0,
-            e_phnum: 0,
+            e_phnum:     0,
             e_shentsize: 0,
-            e_shnum: 0,
-            e_shstrndx: 0,
+            e_shnum:     0,
+            e_shstrndx:  0,
         }
     }
 }

@@ -25,21 +25,6 @@ use std::io;
 use std::io::{Read, Seek};
 
 // --------------------------------------------------------------------------
-macro_rules! impl_load_for {
-    ( $x:ty ) => {
-        impl Load for $x {
-            fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
-                let mut buffer = self.to_ne_bytes();
-                reader.read_exact(&mut buffer)?;
-                *self = <$x>::from_ne_bytes(buffer);
-
-                Ok(())
-            }
-        }
-    };
-}
-
-// --------------------------------------------------------------------------
 /// A trait for reading ELF file payload from a file or memory.
 /// Currently, it is implemented for std::fs::File, std::io::BufReader
 /// and std::io::Cursor
@@ -55,6 +40,21 @@ pub trait Load {
 }
 
 // --------------------------------------------------------------------------
+macro_rules! impl_load_for {
+    ( $x:ty ) => {
+        impl Load for $x {
+            fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
+                let mut buffer = self.to_ne_bytes();
+                reader.read_exact(&mut buffer)?;
+                *self = <$x>::from_ne_bytes(buffer);
+
+                Ok(())
+            }
+        }
+    };
+}
+
+// --------------------------------------------------------------------------
 impl_load_for!(u8);
 impl_load_for!(u16);
 impl_load_for!(u32);
@@ -66,6 +66,20 @@ impl Load for &mut [u8; 16] {
 
         Ok(())
     }
+}
+
+// --------------------------------------------------------------------------
+pub trait Convert<T>
+where
+    T: AsPrimitive<u64>,
+{
+    fn convert(&self, value: T) -> T;
+}
+
+// --------------------------------------------------------------------------
+#[derive(Debug, Copy, Clone)]
+pub struct Converter {
+    pub is_needed: bool,
 }
 
 // --------------------------------------------------------------------------
@@ -92,20 +106,6 @@ macro_rules! impl_convert_for {
             }
         }
     };
-}
-
-// --------------------------------------------------------------------------
-pub trait Convert<T>
-where
-    T: AsPrimitive<u64>,
-{
-    fn convert(&self, value: T) -> T;
-}
-
-// --------------------------------------------------------------------------
-#[derive(Debug, Copy, Clone)]
-pub struct Converter {
-    pub is_needed: bool,
 }
 
 // --------------------------------------------------------------------------

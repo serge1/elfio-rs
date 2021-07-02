@@ -1,2 +1,4 @@
+edition = "2018"
+unstable_features = true
 enum_discrim_align_threshold = 30
 struct_field_align_threshold = 30
