@@ -42,7 +42,7 @@ pub struct Symbol {
     pub shndx: ElfHalf,
 }
 
-#[derive (Default)]
+#[derive(Default)]
 struct Elf32Sym {
     st_name:  ElfWord,
     st_value: Elf32Addr,
@@ -52,7 +52,7 @@ struct Elf32Sym {
     st_shndx: ElfHalf,
 }
 
-#[derive (Default)]
+#[derive(Default)]
 struct Elf64Sym {
     st_name:  ElfWord,
     st_info:  u8,
