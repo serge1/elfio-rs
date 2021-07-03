@@ -20,8 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use crate::utils::Convert;
-
+use super::utils::Convert;
 use super::*;
 use std::convert::TryFrom;
 

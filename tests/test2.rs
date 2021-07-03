@@ -141,3 +141,119 @@ fn sym_be_64() -> io::Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn note_le_32() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_32")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".note.ABI-tag") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let notes = NoteSectionAccessor::new(&elf, section);
+
+    assert_eq!(notes.get_notes_num(), 1);
+
+    let note = notes.get_note(0).unwrap();
+    assert_eq!(note.ntype, 1);
+    assert_eq!(note.name, "GNU");
+    assert_eq!(
+        note.description,
+        vec![0u8, 0u8, 0u8, 0u8, 2u8, 0u8, 0u8, 0u8, 6u8, 0u8, 0u8, 0u8, 9u8, 0u8, 0u8, 0u8]
+    );
+
+    Ok(())
+}
+
+#[test]
+fn note_le_64() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_64")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".note.ABI-tag") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let notes = NoteSectionAccessor::new(&elf, section);
+
+    assert_eq!(notes.get_notes_num(), 1);
+
+    let note = notes.get_note(0).unwrap();
+    assert_eq!(note.ntype, 1);
+    assert_eq!(note.name, "GNU");
+    assert_eq!(
+        note.description,
+        vec![0, 0, 0, 0, 2, 0, 0, 0, 6, 0, 0, 0, 9, 0, 0, 0]
+    );
+
+    Ok(())
+}
+
+#[test]
+fn note_be_32() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".note.ABI-tag") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let notes = NoteSectionAccessor::new(&elf, section);
+
+    assert_eq!(notes.get_notes_num(), 1);
+
+    let note = notes.get_note(0).unwrap();
+    assert_eq!(note.ntype, 1);
+    assert_eq!(note.name, "GNU");
+    assert_eq!(
+        note.description,
+        vec![0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 6, 0, 0, 0, 10]
+    );
+
+    Ok(())
+}
+
+#[test]
+fn note_be_64() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc64")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".note.ABI-tag") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let notes = NoteSectionAccessor::new(&elf, section);
+
+    assert_eq!(notes.get_notes_num(), 1);
+
+    let note = notes.get_note(0).unwrap();
+    assert_eq!(note.ntype, 1);
+    assert_eq!(note.name, "GNU");
+    assert_eq!(
+        note.description,
+        vec![0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 0]
+    );
+
+    Ok(())
+}

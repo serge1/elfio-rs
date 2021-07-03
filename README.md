@@ -10,8 +10,8 @@ called [**ELFIO**](https://github.com/serge1/ELFIO)
 
 ## Status
 
-Work in progress. No official releases were made so far. Your contribution
-is welcomed!
+Work in progress. Only ELF file reader is implemented so far.
+Your contribution is welcomed!
 
 ## Documentation
 

@@ -75,6 +75,7 @@ THE SOFTWARE.
 mod macros;
 
 mod header;
+mod note;
 mod section;
 mod segment;
 mod strings;
@@ -83,6 +84,7 @@ mod types;
 mod utils;
 
 use header::*;
+pub use note::*;
 pub use section::ElfSectionAccessTrait;
 use section::*;
 pub use segment::ElfSegmentAccessTrait;
@@ -258,7 +260,7 @@ impl Elfio {
         Ok(())
     }
 
-    fn create_section(&mut self) -> Box<dyn ElfSectionTrait> {
+    fn create_section(&self) -> Box<dyn ElfSectionTrait> {
         let section: Box<dyn ElfSectionTrait> = if self.header.get_class() == ELFCLASS64 {
             Box::new(ElfSection::<Elf64Addr, Elf64Off, ElfXword>::new(
                 &self.converter,
@@ -287,7 +289,7 @@ impl Elfio {
         Ok(())
     }
 
-    fn create_segment(&mut self) -> Box<dyn ElfSegmentTrait> {
+    fn create_segment(&self) -> Box<dyn ElfSegmentTrait> {
         let segment: Box<dyn ElfSegmentTrait> = if self.header.get_class() == ELFCLASS64 {
             Box::new(ElfSegment::<Elf64Addr, Elf64Off, ElfXword>::new(
                 &self.converter,
