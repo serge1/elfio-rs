@@ -138,6 +138,11 @@ impl Elfio {
         }
     }
 
+    /// Returns a reference for an endianess converter used for the current file
+    pub fn get_converter(&self) -> &utils::Converter {
+        return &self.converter;
+    }
+
     /// Load the ELF file from input stream
     pub fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
@@ -218,6 +223,16 @@ impl Elfio {
         None
     }
 
+    /// Retrieve ELF file section by its index
+    pub fn get_section_by_index(&self, index: ElfHalf) -> Option<&dyn ElfSectionTrait> {
+        let index = index as usize;
+        if index < self.sections.len() {
+            return Some(&*self.sections[index]);
+        }
+
+        None
+    }
+
     fn load_sections(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         let entry_size = self.header.get_section_entry_size() as Elf64Off;
         let num = self.header.get_sections_num() as Elf64Off;
@@ -244,12 +259,12 @@ impl Elfio {
     }
 
     fn create_section(&mut self) -> Box<dyn ElfSectionTrait> {
-        let section: Box<dyn ElfSectionTrait> = if self.header.get_class() == ELFCLASS32 {
-            Box::new(ElfSection::<Elf32Addr, Elf32Off, ElfWord>::new(
+        let section: Box<dyn ElfSectionTrait> = if self.header.get_class() == ELFCLASS64 {
+            Box::new(ElfSection::<Elf64Addr, Elf64Off, ElfXword>::new(
                 &self.converter,
             ))
         } else {
-            Box::new(ElfSection::<Elf64Addr, Elf64Off, ElfXword>::new(
+            Box::new(ElfSection::<Elf32Addr, Elf32Off, ElfWord>::new(
                 &self.converter,
             ))
         };
@@ -273,13 +288,13 @@ impl Elfio {
     }
 
     fn create_segment(&mut self) -> Box<dyn ElfSegmentTrait> {
-        let segment: Box<dyn ElfSegmentTrait> = if self.header.get_class() == ELFCLASS32 {
-            Box::new(ElfSegment::<Elf32Addr, Elf32Off, ElfWord>::new(
+        let segment: Box<dyn ElfSegmentTrait> = if self.header.get_class() == ELFCLASS64 {
+            Box::new(ElfSegment::<Elf64Addr, Elf64Off, ElfXword>::new(
                 &self.converter,
                 self.header.get_class(),
             ))
         } else {
-            Box::new(ElfSegment::<Elf64Addr, Elf64Off, ElfXword>::new(
+            Box::new(ElfSegment::<Elf32Addr, Elf32Off, ElfWord>::new(
                 &self.converter,
                 self.header.get_class(),
             ))

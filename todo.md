@@ -2,8 +2,11 @@
 
 ## Not yet done
 
-- Implement symbol table section accessor
 - Implement Debug for Elfio
+- Implement Note section accessor
+- Implement Relocation section accessor
+- Implement Array section accessor
+- Implement Dynamic section accessor
 - Decide regarding template args. Maybe a single param is enough
 
 ## Done
@@ -26,3 +29,4 @@
 - Implement data access for sections and segments
 - Implement string table section accessor
 - All 'load' functions accept a generic ElfioReadSeek parameter for file/memory access
+- Implement symbol table section accessor

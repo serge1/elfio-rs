@@ -252,3 +252,43 @@ pub const PF_R: ElfWord = 4;
 pub const PF_MASKOS: ElfWord = 0x0ff00000;
 /// Segment's Unspecified flag
 pub const PF_MASKPROC: ElfWord = 0xf0000000;
+
+// Symbol binding
+/// Not visible outside the object file
+pub const STB_LOCAL: u8 = 0;
+/// Global symbol, visible to all object files
+pub const STB_GLOBAL: u8 = 1;
+/// Global scope, but with lower precedence than global symbols
+pub const STB_WEAK: u8 = 2;
+/// Environment-specific use
+pub const STB_LOOS: u8 = 10;
+/// Environment-specific use
+pub const STB_HIOS: u8 = 12;
+/// Processor-specific use
+pub const STB_LOPROC: u8 = 13;
+/// Processor-specific use
+pub const STB_HIPROC: u8 = 15;
+
+// Symbol types
+/// No type specified (e.g., an absolute symbol)
+pub const STT_NOTYPE: u8 = 0;
+/// Data object
+pub const STT_OBJECT: u8 = 1;
+/// Function entry point
+pub const STT_FUNC: u8 = 2;
+/// Symbol is associated with a section
+pub const STT_SECTION: u8 = 3;
+/// Source file associated with the object file
+pub const STT_FILE: u8 = 4;
+/// The symbol labels a common block that has not yet been allocated.
+pub const STT_COMMON: u8 = 5;
+///
+pub const STT_TLS: u8 = 6;
+/// Environment-specific use
+pub const STT_LOOS: u8 = 10;
+/// Environment-specific use
+pub const STT_HIOS: u8 = 12;
+/// Values in this inclusive range are reserved for processor-specific semantics
+pub const STT_LOPROC: u8 = 13;
+/// Values in this inclusive range are reserved for processor-specific semantics
+pub const STT_HIPROC: u8 = 15;

@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+use crate::utils::Convert;
+
 use super::*;
 use std::convert::TryFrom;
 
@@ -33,8 +35,10 @@ pub struct Symbol {
     pub value: Elf64Addr,
     /// The symbol's associated size
     pub size:  ElfXword,
-    /// This member specifies the symbol's type and binding attributes
-    pub info:  u8,
+    /// This member specifies the symbol's binding attribute
+    pub bind:  u8,
+    /// This member specifies the symbol's type attribute
+    pub stype: u8,
     /// This member specifies a symbol's visibility
     pub other: u8,
     /// Every symbol table entry is defined in relation to some section.
@@ -92,53 +96,71 @@ impl<'a> SymbolSectionAccessor<'a> {
         let end: usize = offset + self.section.get_entry_size() as usize;
         let symbol_area = &self.section.get_data()[offset..end];
 
+        let converter = self.elfio.get_converter();
+
         if self.elfio.get_class() == ELFCLASS64 {
             let mut sym: Elf64Sym = Default::default();
-            sym.st_name = u32::from_ne_bytes(
-                <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            );
-            sym.st_info = symbol_area[4];
-            sym.st_other = symbol_area[5];
-            sym.st_shndx =
-                u16::from_ne_bytes(<[u8; 2]>::try_from(&symbol_area[6..8]).unwrap_or([0u8, 0u8]));
-            sym.st_value = u64::from_ne_bytes(
+            sym.st_name = converter.convert(u32::from_ne_bytes(
+                <[u8; 4]>::try_from(&symbol_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+            ));
+            sym.st_info = converter.convert(symbol_area[4]);
+            sym.st_other = converter.convert(symbol_area[5]);
+            sym.st_shndx = converter.convert(u16::from_ne_bytes(
+                <[u8; 2]>::try_from(&symbol_area[6..8]).unwrap_or([0u8, 0u8]),
+            ));
+            sym.st_value = converter.convert(u64::from_ne_bytes(
                 <[u8; 8]>::try_from(&symbol_area[8..16])
                     .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            );
-            sym.st_size = u64::from_ne_bytes(
+            ));
+            sym.st_size = converter.convert(u64::from_ne_bytes(
                 <[u8; 8]>::try_from(&symbol_area[16..24])
                     .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            );
+            ));
+
+            let string_section = self
+                .elfio
+                .get_section_by_index(self.section.get_link() as ElfHalf);
+            let string_accessor = StringSectionAccessor::new(string_section.unwrap());
+            let name = string_accessor.get_string(sym.st_name);
 
             Some(Symbol {
-                name:  sym.st_name.to_string(),
+                name:  name,
                 value: sym.st_value,
                 size:  sym.st_size,
-                info:  sym.st_info,
+                bind:  sym.st_info >> 4,
+                stype: sym.st_info & 0xF,
                 other: sym.st_other,
                 shndx: sym.st_shndx,
             })
         } else {
             let mut sym: Elf32Sym = Default::default();
-            sym.st_name = u32::from_ne_bytes(
-                <[u8; 4]>::try_from(symbol_area).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            );
-            sym.st_value = u32::from_ne_bytes(
+            sym.st_name = converter.convert(u32::from_ne_bytes(
+                <[u8; 4]>::try_from(&symbol_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+            ));
+            sym.st_value = converter.convert(u32::from_ne_bytes(
                 <[u8; 4]>::try_from(&symbol_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            );
-            sym.st_size = u32::from_ne_bytes(
+            ));
+            sym.st_size = converter.convert(u32::from_ne_bytes(
                 <[u8; 4]>::try_from(&symbol_area[8..12]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            );
-            sym.st_info = symbol_area[12];
-            sym.st_other = symbol_area[13];
-            sym.st_shndx =
-                u16::from_ne_bytes(<[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]));
+            ));
+            sym.st_info = converter.convert(symbol_area[12]);
+            sym.st_other = converter.convert(symbol_area[13]);
+            sym.st_shndx = converter.convert(u16::from_ne_bytes(
+                <[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]),
+            ));
+
+            let string_section = self
+                .elfio
+                .get_section_by_index(self.section.get_link() as ElfHalf);
+            let string_accessor = StringSectionAccessor::new(string_section.unwrap());
+            let name = string_accessor.get_string(sym.st_name);
 
             Some(Symbol {
-                name:  sym.st_name.to_string(),
+                name:  name,
                 value: sym.st_value as u64,
                 size:  sym.st_size as u64,
-                info:  sym.st_info,
+                bind:  sym.st_info >> 4,
+                stype: sym.st_info & 0xF,
                 other: sym.st_other,
                 shndx: sym.st_shndx,
             })
