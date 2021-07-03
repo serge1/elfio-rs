@@ -39,6 +39,43 @@ pub struct Note {
 }
 
 /// A section data accessor intended to note sections
+///
+/// For example:
+/// ```
+/// use std::fs::File;
+/// use std::io;
+/// use std::io::{BufReader, Error};
+///
+/// use elfio::Elfio;
+///
+/// fn main() -> io::Result<()> {
+///     let elf_file = File::open("tests/files/hello_32")?;
+///     let mut reader = BufReader::new(elf_file);
+///
+///     let mut elf = Elfio::new();
+///
+///     elf.load(&mut reader)?;
+///
+///     let section = match elf.get_section_by_name(&".note.ABI-tag") {
+///         Some(s) => s,
+///         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+///     };
+///
+///     let notes = elfio::NoteSectionAccessor::new(&elf, section);
+///
+///     assert_eq!(notes.get_notes_num(), 1);
+///
+///     let note = notes.get_note(0).unwrap();
+///     assert_eq!(note.ntype, 1);
+///     assert_eq!(note.name, "GNU");
+///     assert_eq!(
+///         note.description,
+///         vec![0u8, 0u8, 0u8, 0u8, 2u8, 0u8, 0u8, 0u8, 6u8, 0u8, 0u8, 0u8, 9u8, 0u8, 0u8, 0u8]
+///     );
+///
+///     Ok(())
+/// }
+/// ```
 pub struct NoteSectionAccessor<'a> {
     elfio:                &'a Elfio,
     section:              &'a dyn ElfSectionTrait,

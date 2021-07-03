@@ -66,6 +66,43 @@ struct Elf64Sym {
 }
 
 /// A section data accessor intended to symbol tables
+///
+/// For example:
+/// ```
+/// use std::fs::File;
+/// use std::io;
+/// use std::io::{BufReader, Error};
+///
+/// use elfio::Elfio;
+///
+/// fn main() -> io::Result<()> {
+///     let elf_file = File::open("tests/files/hello_32")?;
+///     let mut reader = BufReader::new(elf_file);
+///
+///     let mut elf = Elfio::new();
+///
+///     elf.load(&mut reader)?;
+///
+///    let section = match elf.get_section_by_name(&".symtab") {
+///        Some(s) => s,
+///        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+///    };
+///
+///    let symtab = elfio::SymbolSectionAccessor::new(&elf, &*section);
+///    assert_eq!(symtab.get_symbols_num(), 0x44);
+///    // Num:    Value  Size Type    Bind   Vis      Ndx Name
+///    //  30: 08049588     4 OBJECT  LOCAL  DEFAULT   23 dtor_idx.5805
+///    let sym = symtab.get_symbol(30).unwrap();
+///    assert_eq!(sym.value, 0x08049588);
+///    assert_eq!(sym.size, 4);
+///    assert_eq!(sym.bind, elfio::STB_LOCAL);
+///    assert_eq!(sym.stype, elfio::STT_OBJECT);
+///    assert_eq!(sym.shndx, 23);
+///    assert_eq!(sym.name, "dtor_idx.5805");
+///
+///     Ok(())
+/// }
+/// ```
 pub struct SymbolSectionAccessor<'a> {
     elfio:   &'a Elfio,
     section: &'a dyn ElfSectionTrait,
