@@ -27,6 +27,8 @@ use std::convert::TryFrom;
 /// A note entry. The note is used by compilers and other tools
 /// to mark an object file with special information that has special
 /// meaning to a particular tool set.
+///
+/// See documentation for [NoteSectionAccessor] for usage example
 pub struct Note {
     /// A number that determines, along with the originator’s name,
     /// the interpretation of the note contents

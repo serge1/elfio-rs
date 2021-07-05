@@ -25,6 +25,8 @@ use super::*;
 use std::convert::TryFrom;
 
 /// A struct represents a single symbol from symbol table section
+///
+/// See documentation for [SymbolSectionAccessor] for usage example
 #[repr(C)]
 #[derive(Debug, Default)]
 pub struct Symbol {

@@ -2,7 +2,6 @@
 
 ## Not yet done
 
-- Add examples for Note and Symbol accessors
 - Implement Debug for Elfio
 - Implement Relocation section accessor
 - Implement Array section accessor
@@ -31,3 +30,4 @@
 - All 'load' functions accept a generic ElfioReadSeek parameter for file/memory access
 - Implement symbol table section accessor
 - Implement Note section accessor
+- Add examples for Note and Symbol accessors

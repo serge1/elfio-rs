@@ -1,4 +1,4 @@
-# ELFIO-RS
+# ELFIO
 
 **ELFIO** is a Rust library intended for reading and generating
 files in the ELF binary format. The library supports processing
@@ -21,6 +21,6 @@ Use **cargo** to produce the library documentation:
 
 ## Licensed under either of these:
 
-- Apache License, Version 2.0, (LICENSE-APACHE or https://www.apache.org/licenses/LICENSE-2.0)
-
 - MIT license (LICENSE-MIT or https://opensource.org/licenses/MIT)
+
+- Apache License, Version 2.0, (LICENSE-APACHE or https://www.apache.org/licenses/LICENSE-2.0)
