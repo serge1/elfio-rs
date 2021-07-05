@@ -3,6 +3,18 @@ name = "elfio"
 version = "0.3.1"
 authors = ["Serge Lamikhov-Center <to_serge@hotmail.com>"]
 edition = "2018"
+description = "ELFIO is a Rust library intended for reading and generating files in the ELF binary format"
+readme = "README.md"
+homepage = "https://github.com/serge1/elfio-rs"
+repository = "https://github.com/serge1/elfio-rs"
+license = "MIT OR Apache-2.0"
+keywords = ["elf", "bin"]
+categories = ["filesystem", "development-tools::build-utils", "embedded", "parser-implementations", "emulators"]
+exclude = [
+    "todo.md",
+    ".vscode/",
+    ".gitignore",
+]
 
 [lib]
 name = "elfio"
