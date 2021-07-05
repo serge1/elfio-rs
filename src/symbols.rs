@@ -27,7 +27,6 @@ use std::convert::TryFrom;
 /// A struct represents a single symbol from symbol table section
 ///
 /// See documentation for [SymbolSectionAccessor] for usage example
-#[repr(C)]
 #[derive(Debug, Default)]
 pub struct Symbol {
     /// The name of the associated symbol
@@ -47,6 +46,7 @@ pub struct Symbol {
     pub shndx: ElfHalf,
 }
 
+#[repr(C)]
 #[derive(Default)]
 struct Elf32Sym {
     st_name:  ElfWord,
@@ -57,6 +57,7 @@ struct Elf32Sym {
     st_shndx: ElfHalf,
 }
 
+#[repr(C)]
 #[derive(Default)]
 struct Elf64Sym {
     st_name:  ElfWord,
@@ -85,22 +86,22 @@ struct Elf64Sym {
 ///
 ///     elf.load(&mut reader)?;
 ///
-///    let section = match elf.get_section_by_name(&".symtab") {
-///        Some(s) => s,
-///        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
-///    };
+///     let section = match elf.get_section_by_name(&".symtab") {
+///         Some(s) => s,
+///         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+///     };
 ///
-///    let symtab = elfio::SymbolSectionAccessor::new(&elf, &*section);
-///    assert_eq!(symtab.get_symbols_num(), 0x44);
-///    // Num:    Value  Size Type    Bind   Vis      Ndx Name
-///    //  30: 08049588     4 OBJECT  LOCAL  DEFAULT   23 dtor_idx.5805
-///    let sym = symtab.get_symbol(30).unwrap();
-///    assert_eq!(sym.value, 0x08049588);
-///    assert_eq!(sym.size, 4);
-///    assert_eq!(sym.bind, elfio::STB_LOCAL);
-///    assert_eq!(sym.stype, elfio::STT_OBJECT);
-///    assert_eq!(sym.shndx, 23);
-///    assert_eq!(sym.name, "dtor_idx.5805");
+///     let symtab = elfio::SymbolSectionAccessor::new(&elf, &*section);
+///     assert_eq!(symtab.get_symbols_num(), 0x44);
+///     // Num:    Value  Size Type    Bind   Vis      Ndx Name
+///     //  30: 08049588     4 OBJECT  LOCAL  DEFAULT   23 dtor_idx.5805
+///     let sym = symtab.get_symbol(30).unwrap();
+///     assert_eq!(sym.value, 0x08049588);
+///     assert_eq!(sym.size, 4);
+///     assert_eq!(sym.bind, elfio::STB_LOCAL);
+///     assert_eq!(sym.stype, elfio::STT_OBJECT);
+///     assert_eq!(sym.shndx, 23);
+///     assert_eq!(sym.name, "dtor_idx.5805");
 ///
 ///     Ok(())
 /// }
@@ -127,9 +128,11 @@ impl<'a> SymbolSectionAccessor<'a> {
 
     /// Get a symbol by its index
     pub fn get_symbol(&self, index: ElfXword) -> Option<Symbol> {
-        if index > self.get_symbols_num() - 1 {
+        let symbols_num = self.get_symbols_num();
+        if symbols_num == 0 || index > symbols_num - 1 {
             return None;
         }
+
         let offset: usize = (index * self.section.get_entry_size()) as usize;
         let end: usize = offset + self.section.get_entry_size() as usize;
         let symbol_area = &self.section.get_data()[offset..end];

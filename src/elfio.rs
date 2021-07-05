@@ -76,6 +76,7 @@ mod macros;
 
 mod header;
 mod note;
+mod relocation;
 mod section;
 mod segment;
 mod strings;
@@ -85,6 +86,7 @@ mod utils;
 
 use header::*;
 pub use note::*;
+pub use relocation::*;
 pub use section::ElfSectionAccessTrait;
 use section::*;
 pub use segment::ElfSegmentAccessTrait;

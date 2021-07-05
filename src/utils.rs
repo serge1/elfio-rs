@@ -110,9 +110,13 @@ macro_rules! impl_convert_for {
 
 // --------------------------------------------------------------------------
 impl_convert_for!(u8);
+impl_convert_for!(i8);
 impl_convert_for!(u16);
+impl_convert_for!(i16);
 impl_convert_for!(u32);
+impl_convert_for!(i32);
 impl_convert_for!(u64);
+impl_convert_for!(i64);
 
 // --------------------------------------------------------------------------
 #[test]
