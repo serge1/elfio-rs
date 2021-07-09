@@ -24,6 +24,7 @@ use super::utils::Convert;
 use super::*;
 use std::convert::TryFrom;
 
+// --------------------------------------------------------------------------
 /// A struct represents a single symbol from symbol table section
 ///
 /// See documentation for [SymbolSectionAccessor] for usage example
@@ -46,6 +47,7 @@ pub struct Symbol {
     pub shndx: ElfHalf,
 }
 
+// --------------------------------------------------------------------------
 #[repr(C)]
 #[derive(Default)]
 struct Elf32Sym {
@@ -68,6 +70,7 @@ struct Elf64Sym {
     st_size:  ElfXword,
 }
 
+// --------------------------------------------------------------------------
 /// A section data accessor intended to symbol tables
 ///
 /// For example:
@@ -111,6 +114,7 @@ pub struct SymbolSectionAccessor<'a> {
     section: &'a dyn ElfSectionTrait,
 }
 
+// --------------------------------------------------------------------------
 impl<'a> SymbolSectionAccessor<'a> {
     /// Creates a new instance of the symbol table accessor
     pub fn new(elfio: &'a Elfio, section: &'a dyn ElfSectionTrait) -> SymbolSectionAccessor<'a> {
@@ -161,7 +165,7 @@ impl<'a> SymbolSectionAccessor<'a> {
             let string_section = self
                 .elfio
                 .get_section_by_index(self.section.get_link() as ElfHalf);
-            let string_accessor = StringSectionAccessor::new(string_section.unwrap());
+            let string_accessor = StringSectionAccessor::new(self.elfio, string_section.unwrap());
             let name = string_accessor.get_string(sym.st_name);
 
             Some(Symbol {
@@ -193,7 +197,7 @@ impl<'a> SymbolSectionAccessor<'a> {
             let string_section = self
                 .elfio
                 .get_section_by_index(self.section.get_link() as ElfHalf);
-            let string_accessor = StringSectionAccessor::new(string_section.unwrap());
+            let string_accessor = StringSectionAccessor::new(self.elfio, string_section.unwrap());
             let name = string_accessor.get_string(sym.st_name);
 
             Some(Symbol {

@@ -77,6 +77,7 @@ mod macros;
 mod array;
 mod dynamic;
 mod header;
+mod modinfo;
 mod note;
 mod relocation;
 mod section;
@@ -89,6 +90,7 @@ mod utils;
 pub use array::*;
 pub use dynamic::*;
 use header::*;
+pub use modinfo::*;
 pub use note::*;
 pub use relocation::*;
 pub use section::ElfSectionAccessTrait;
@@ -262,7 +264,7 @@ impl Elfio {
         if shstrndx != constant::SHN_UNDEF {
             for i in 1..num {
                 let pos = self.sections[i as usize].get_name_string_offset();
-                let acc = StringSectionAccessor::new(&*self.sections[shstrndx as usize]);
+                let acc = StringSectionAccessor::new(&self, &*self.sections[shstrndx as usize]);
                 let name = acc.get_string(pos);
                 self.sections[i as usize].set_name(&name);
             }

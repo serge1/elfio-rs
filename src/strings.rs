@@ -43,7 +43,7 @@ use super::*;
 ///
 ///     match section {
 ///         Some(s) => {
-///             let strtab = StringSectionAccessor::new(s);
+///             let strtab = StringSectionAccessor::new(&elf, s);
 ///             println!("{}", strtab.get_string(1));
 ///         }
 ///         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
@@ -55,6 +55,7 @@ use super::*;
 
 // --------------------------------------------------------------------------
 pub struct StringSectionAccessor<'a> {
+    _elfio:  &'a Elfio,
     section: &'a dyn ElfSectionTrait,
 }
 
@@ -62,8 +63,11 @@ pub struct StringSectionAccessor<'a> {
 impl<'a> StringSectionAccessor<'a> {
     // --------------------------------------------------------------------------
     /// Creates a new instance of the string table accessor
-    pub fn new(section: &'a dyn ElfSectionTrait) -> StringSectionAccessor<'a> {
-        StringSectionAccessor { section }
+    pub fn new(elfio: &'a Elfio, section: &'a dyn ElfSectionTrait) -> StringSectionAccessor<'a> {
+        StringSectionAccessor {
+            _elfio: elfio,
+            section,
+        }
     }
 
     // --------------------------------------------------------------------------

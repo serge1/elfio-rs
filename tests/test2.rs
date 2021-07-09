@@ -473,7 +473,7 @@ fn dyn_be_32() -> io::Result<()> {
         Some(s) => s,
         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
     };
-    let dynstr = StringSectionAccessor::new(strsection);
+    let dynstr = StringSectionAccessor::new(&elf, strsection);
     assert_eq!(dynstr.get_string(dynamic.value as ElfWord), "libc.so.6");
 
     let dynamic = dyns.get_entry(4).unwrap();
@@ -515,7 +515,7 @@ fn dyn_be_64() -> io::Result<()> {
         Some(s) => s,
         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
     };
-    let dynstr = StringSectionAccessor::new(strsection);
+    let dynstr = StringSectionAccessor::new(&elf, strsection);
     assert_eq!(dynstr.get_string(dynamic.value as ElfWord), "libc.so.6");
 
     let dynamic = dyns.get_entry(4).unwrap();
@@ -629,6 +629,28 @@ fn array_be_64() -> io::Result<()> {
 
     let element = array.get_entry(0).unwrap();
     assert_eq!(element.value, 0x000000000001faf8);
+
+    Ok(())
+}
+
+#[test]
+fn modinfo_le_32() -> io::Result<()> {
+    let elf_file = File::open("tests/files/i2c-gpio.ko")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".modinfo") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let modinfo = ModInfoSectionAccessor::new(&elf, section);
+
+    assert_eq!(modinfo.get_entries_num(), 10);
+    assert_eq!(modinfo.get(&"description".to_string()).unwrap(), "Platform-independent bitbanging I2C driver");
 
     Ok(())
 }
