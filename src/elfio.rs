@@ -74,6 +74,7 @@ THE SOFTWARE.
 #[macro_use]
 mod macros;
 
+mod dynamic;
 mod header;
 mod note;
 mod relocation;
@@ -84,6 +85,7 @@ mod symbols;
 mod types;
 mod utils;
 
+pub use dynamic::*;
 use header::*;
 pub use note::*;
 pub use relocation::*;

@@ -369,3 +369,162 @@ fn rel_be_64() -> io::Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn dyn_le_32() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_32")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".dynamic") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let dyns = DynamicSectionAccessor::new(&elf, section);
+
+    assert_eq!(dyns.get_entries_num(), 20);
+
+    // Dynamic section at offset 0x4a0 contains 20 entries:
+    //   Tag        Type                         Name/Value
+    //  0x00000001 (NEEDED)                     Shared library: [libc.so.6]
+    //  0x0000000c (INIT)                       0x804824c
+    //  0x0000000d (FINI)                       0x8048458
+    //  0x6ffffef5 (GNU_HASH)                   0x8048148
+    //  0x00000005 (STRTAB)                     0x80481b8
+    let dynamic = dyns.get_entry(3).unwrap();
+    assert_eq!(dynamic.tag, 0x6ffffef5);
+    assert_eq!(dynamic.value, 0x8048148);
+
+    let dynamic = dyns.get_entry(4).unwrap();
+    assert_eq!(dynamic.tag, 0x00000005);
+    assert_eq!(dynamic.value, 0x80481b8);
+
+    Ok(())
+}
+
+#[test]
+fn dyn_le_64() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_64")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".dynamic") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let dyns = DynamicSectionAccessor::new(&elf, section);
+
+    assert_eq!(dyns.get_entries_num(), 20);
+
+    // Dynamic section at offset 0x698 contains 20 entries:
+    //   Tag        Type                         Name/Value
+    //  0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+    //  0x000000000000000c (INIT)               0x400370
+    //  0x000000000000000d (FINI)               0x400588
+    //  0x000000006ffffef5 (GNU_HASH)           0x400240
+    //  0x0000000000000005 (STRTAB)             0x4002c0
+    let dynamic = dyns.get_entry(3).unwrap();
+    assert_eq!(dynamic.tag, 0x6ffffef5);
+    assert_eq!(dynamic.value, 0x400240);
+
+    let dynamic = dyns.get_entry(4).unwrap();
+    assert_eq!(dynamic.tag, 0x00000005);
+    assert_eq!(dynamic.value, 0x4002c0);
+
+    Ok(())
+}
+
+#[test]
+fn dyn_be_32() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".dynamic") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let dyns = DynamicSectionAccessor::new(&elf, section);
+
+    assert_eq!(dyns.get_entries_num(), 24);
+
+    // Dynamic section at offset 0xaec contains 24 entries:
+    //   Tag        Type                         Name/Value
+    //  0x00000001 (NEEDED)                     Shared library: [libstdc++.so.6]
+    //  0x00000001 (NEEDED)                     Shared library: [libm.so.6]
+    //  0x00000001 (NEEDED)                     Shared library: [libgcc_s.so.1]
+    //  0x00000001 (NEEDED)                     Shared library: [libc.so.6]
+    //  0x0000000c (INIT)                       0x10000500
+    let dynamic = dyns.get_entry(3).unwrap();
+    assert_eq!(dynamic.tag, 0x00000001);
+    let strsection = match elf.get_section_by_name(&".dynstr") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+    let dynstr = StringSectionAccessor::new(strsection);
+    assert_eq!(dynstr.get_string(dynamic.value as ElfWord), "libc.so.6");
+
+    let dynamic = dyns.get_entry(4).unwrap();
+    assert_eq!(dynamic.tag, 0x0000000c);
+    assert_eq!(dynamic.value, 0x10000500);
+
+    Ok(())
+}
+
+#[test]
+fn dyn_be_64() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc64")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".dynamic") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let dyns = DynamicSectionAccessor::new(&elf, section);
+
+    assert_eq!(dyns.get_entries_num(), 28);
+
+    // Dynamic section at offset 0xf880 contains 28 entries:
+    //   Tag        Type                         Name/Value
+    //  0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+    //  0x000000000000000c (INIT)               0x1fa98
+    //  0x000000000000000d (FINI)               0x1fab0
+    //  0x0000000000000019 (INIT_ARRAY)         0x1f850
+    //  0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+    //  0x000000000000001a (FINI_ARRAY)         0x1f858
+    let dynamic = dyns.get_entry(0).unwrap();
+    assert_eq!(dynamic.tag, 0x00000001);
+    let strsection = match elf.get_section_by_name(&".dynstr") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+    let dynstr = StringSectionAccessor::new(strsection);
+    assert_eq!(dynstr.get_string(dynamic.value as ElfWord), "libc.so.6");
+
+    let dynamic = dyns.get_entry(4).unwrap();
+    assert_eq!(dynamic.tag, 0x0000001b);
+    assert_eq!(dynamic.value, 8);
+
+    let dynamic = dyns.get_entry(5).unwrap();
+    assert_eq!(dynamic.tag, 0x0000001a);
+    assert_eq!(dynamic.value, 0x1f858);
+
+    Ok(())
+}

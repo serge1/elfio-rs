@@ -292,3 +292,93 @@ pub const STT_HIOS: u8 = 12;
 pub const STT_LOPROC: u8 = 13;
 /// Values in this inclusive range are reserved for processor-specific semantics
 pub const STT_HIPROC: u8 = 15;
+
+// Dynamic Array Tags
+/// Marks the end of the dynamic array
+pub const DT_NULL: ElfSxword = 0;
+/// The string table offset of the name of a needed library.
+pub const DT_NEEDED: ElfSxword = 1;
+/// Total size, in bytes, of the relocation entries associated with
+/// the procedure linkage table
+pub const DT_PLTRELSZ: ElfSxword = 2;
+/// Contains an address associated with the linkage table. The
+/// specific meaning of this field is processor-dependent.
+pub const DT_PLTGOT: ElfSxword = 3;
+/// Address of the symbol hash table, described below
+pub const DT_HASH: ElfSxword = 4;
+/// Address of the dynamic string table.
+pub const DT_STRTAB: ElfSxword = 5;
+/// Address of the dynamic symbol table
+pub const DT_SYMTAB: ElfSxword = 6;
+/// Address of a relocation table with Elfxx_Rela entries
+pub const DT_RELA: ElfSxword = 7;
+/// Total size, in bytes, of the DT_RELA relocation table
+pub const DT_RELASZ: ElfSxword = 8;
+/// Size, in bytes, of each DT_RELA relocation entry
+pub const DT_RELAENT: ElfSxword = 9;
+/// Total size, in bytes, of the string table
+pub const DT_STRSZ: ElfSxword = 10;
+/// Size, in bytes, of each symbol table entry
+pub const DT_SYMENT: ElfSxword = 11;
+/// Address of the initialization function
+pub const DT_INIT: ElfSxword = 12;
+/// Address of the termination function.
+pub const DT_FINI: ElfSxword = 13;
+/// The string table offset of the name of this shared object
+pub const DT_SONAME: ElfSxword = 14;
+/// The string table offset of a shared library search path string
+pub const DT_RPATH: ElfSxword = 15;
+/// The presence of this dynamic table entry modifies the
+/// symbol resolution algorithm for references within the
+/// library.
+pub const DT_SYMBOLIC: ElfSxword = 16;
+/// Address of a relocation table with Elfxx_Rel entries
+pub const DT_REL: ElfSxword = 17;
+/// Total size, in bytes, of the DT_REL relocation table
+pub const DT_RELSZ: ElfSxword = 18;
+/// Size, in bytes, of each DT_REL relocation entry.
+pub const DT_RELENT: ElfSxword = 19;
+/// Type of relocation entry used for the procedure linkage table
+pub const DT_PLTREL: ElfSxword = 20;
+/// Reserved for debugger use
+pub const DT_DEBUG: ElfSxword = 21;
+/// The presence of this dynamic table entry signals that the
+/// relocation table contains relocations for a non-writable
+/// segment
+pub const DT_TEXTREL: ElfSxword = 22;
+/// Address of the relocations associated with the procedure linkage table
+pub const DT_JMPREL: ElfSxword = 23;
+/// The presence of this dynamic table entry signals that the
+/// dynamic loader should process all relocations for this object
+/// before transferring control to the program
+pub const DT_BIND_NOW: ElfSxword = 24;
+/// Pointer to an array of pointers to initialization functions
+pub const DT_INIT_ARRAY: ElfSxword = 25;
+/// Pointer to an array of pointers to termination functions
+pub const DT_FINI_ARRAY: ElfSxword = 26;
+/// Size, in bytes, of the array of initialization functions
+pub const DT_INIT_ARRAYSZ: ElfSxword = 27;
+/// Size, in bytes, of the array of termination functions
+pub const DT_FINI_ARRAYSZ: ElfSxword = 28;
+///
+pub const DT_RUNPATH: ElfSxword = 29;
+///
+pub const DT_FLAGS: ElfSxword = 30;
+///
+pub const DT_ENCODING: ElfSxword = 32;
+///
+pub const DT_PREINIT_ARRAY: ElfSxword = 32;
+///
+pub const DT_PREINIT_ARRAYSZ: ElfSxword = 33;
+///
+pub const DT_MAXPOSTAGS: ElfSxword = 34;
+/// Defines a range of dynamic table tags that are reserved for
+/// environment-specific use
+pub const DT_LOOS: ElfSxword = 0x6000000D;
+///
+pub const DT_HIOS: ElfSxword = 0x6ffff000;
+/// Defines a range of dynamic table tags that are reserved for
+/// processor-specific use
+pub const DT_LOPROC: ElfSxword = 0x70000000;
+///
+pub const DT_HIPROC: ElfSxword = 0x7FFFFFFF;
