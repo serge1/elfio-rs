@@ -24,6 +24,7 @@ use super::*;
 use std::collections::hash_map::Iter;
 use std::collections::HashMap;
 
+// --------------------------------------------------------------------------
 /// A section data accessor intended to modinfo tables. The accessor is useful
 /// for kernel modules data
 ///
@@ -47,9 +48,9 @@ use std::collections::HashMap;
 ///         Some(s) => s,
 ///         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
 ///     };
-/// 
+///
 ///     let modinfo = elfio::ModInfoSectionAccessor::new(&elf, section);
-/// 
+///
 ///     assert_eq!(modinfo.get_entries_num(), 10);
 ///     assert_eq!(modinfo.get(&"description".to_string()).unwrap(), "Platform-independent bitbanging I2C driver");
 ///
@@ -59,16 +60,17 @@ use std::collections::HashMap;
 pub struct ModInfoSectionAccessor<'a> {
     _elfio:   &'a Elfio,
     _section: &'a dyn ElfSectionTrait,
-    content: HashMap<String, String>,
+    content:  HashMap<String, String>,
 }
 
+// --------------------------------------------------------------------------
 impl<'a> ModInfoSectionAccessor<'a> {
     /// Creates a new instance of the relocation table accessor
     pub fn new(elfio: &'a Elfio, section: &'a dyn ElfSectionTrait) -> ModInfoSectionAccessor<'a> {
         let mut mi = ModInfoSectionAccessor {
-            _elfio: elfio,
+            _elfio:   elfio,
             _section: section,
-            content: HashMap::new(),
+            content:  HashMap::new(),
         };
 
         let data = section.get_data();
@@ -101,16 +103,19 @@ impl<'a> ModInfoSectionAccessor<'a> {
         unsafe { ::std::str::from_utf8_unchecked(&utf8_src[0..nul_range_end]) }
     }
 
+    // --------------------------------------------------------------------------
     /// Returns the number of modinfo entries
     pub fn get_entries_num(&self) -> ElfXword {
         self.content.len() as ElfXword
     }
 
+    // --------------------------------------------------------------------------
     /// Get iterator over all modinfo entries
     pub fn get_iter(&self) -> Iter<String, String> {
         return self.content.iter();
     }
 
+    // --------------------------------------------------------------------------
     /// Retrieve a value by its key
     pub fn get(&self, field: &String) -> Option<&String> {
         self.content.get(field)

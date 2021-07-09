@@ -3,7 +3,6 @@
 ## Not yet done
 
 - Implement Debug for Elfio and (maybe) other Structures/Traits
-- Implement ModInfo section accessor
 - Decide regarding template args. Maybe a single param is enough
 
 ## Done
@@ -32,3 +31,4 @@
 - Implement Relocation section accessor
 - Implement Array section accessor
 - Implement Dynamic section accessor
+- Implement ModInfo section accessor
