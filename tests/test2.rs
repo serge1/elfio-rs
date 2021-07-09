@@ -528,3 +528,107 @@ fn dyn_be_64() -> io::Result<()> {
 
     Ok(())
 }
+
+#[test]
+fn array_le_32() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_32")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".ctors") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let array = ArraySectionAccessor::new(&elf, section);
+
+    assert_eq!(array.get_entries_num(), 2);
+
+    let element = array.get_entry(0).unwrap();
+    assert_eq!(element.value, 0xFFFFFFFF);
+    let element = array.get_entry(1).unwrap();
+    assert_eq!(element.value, 0x00000000);
+
+    Ok(())
+}
+
+#[test]
+fn array_le_64() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_64")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".dtors") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let array = ArraySectionAccessor::new(&elf, section);
+
+    assert_eq!(array.get_entries_num(), 2);
+
+    let element = array.get_entry(0).unwrap();
+    assert_eq!(element.value, 0xFFFFFFFFFFFFFFFF);
+    let element = array.get_entry(1).unwrap();
+    assert_eq!(element.value, 0x00000000);
+
+    Ok(())
+}
+
+#[test]
+fn array_be_32() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".ctors") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let array = ArraySectionAccessor::new(&elf, section);
+
+    assert_eq!(array.get_entries_num(), 3);
+
+    let element = array.get_entry(0).unwrap();
+    assert_eq!(element.value, 0xFFFFFFFF);
+    let element = array.get_entry(1).unwrap();
+    assert_eq!(element.value, 0x10000778);
+    let element = array.get_entry(2).unwrap();
+    assert_eq!(element.value, 0x00000000);
+
+    Ok(())
+}
+
+#[test]
+fn array_be_64() -> io::Result<()> {
+    let elf_file = File::open("tests/files/hello_ppc64")?;
+    let mut reader = BufReader::new(elf_file);
+
+    let mut elf = Elfio::new();
+
+    elf.load(&mut reader)?;
+
+    let section = match elf.get_section_by_name(&".fini_array") {
+        Some(s) => s,
+        None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
+    };
+
+    let array = ArraySectionAccessor::new(&elf, section);
+
+    assert_eq!(array.get_entries_num(), 1);
+
+    let element = array.get_entry(0).unwrap();
+    assert_eq!(element.value, 0x000000000001faf8);
+
+    Ok(())
+}
