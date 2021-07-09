@@ -173,7 +173,7 @@ where
         self.sh_entsize.load(reader)?;
 
         self.data = vec![0; self.get_size().as_()];
-        if self.get_type() != SHT_NULL && self.get_type() != SHT_NOBITS {
+        if self.get_type() != constant::SHT_NULL && self.get_type() != constant::SHT_NOBITS {
             reader.seek(io::SeekFrom::Start(self.get_offset()))?;
             reader.read_exact(&mut self.data)?;
         }

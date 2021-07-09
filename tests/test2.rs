@@ -47,8 +47,8 @@ fn sym_le_32() -> io::Result<()> {
     let sym = symtab.get_symbol(30).unwrap();
     assert_eq!(sym.value, 0x08049588);
     assert_eq!(sym.size, 4);
-    assert_eq!(sym.bind, STB_LOCAL);
-    assert_eq!(sym.stype, STT_OBJECT);
+    assert_eq!(sym.bind, constant::STB_LOCAL);
+    assert_eq!(sym.stype, constant::STT_OBJECT);
     assert_eq!(sym.shndx, 23);
     assert_eq!(sym.name, "dtor_idx.5805");
 
@@ -76,8 +76,8 @@ fn sym_le_64() -> io::Result<()> {
     // 33: 0000000000400410     0 FUNC    LOCAL  DEFAULT   12 __do_global_dtors_aux
     assert_eq!(sym.value, 0x400410);
     assert_eq!(sym.size, 0);
-    assert_eq!(sym.bind, STB_LOCAL);
-    assert_eq!(sym.stype, STT_FUNC);
+    assert_eq!(sym.bind, constant::STB_LOCAL);
+    assert_eq!(sym.stype, constant::STT_FUNC);
     assert_eq!(sym.shndx, 12);
     assert_eq!(sym.name, "__do_global_dtors_aux");
 
@@ -105,8 +105,8 @@ fn sym_be_32() -> io::Result<()> {
     // 34: 10010c98     1 OBJECT  LOCAL  DEFAULT   24 completed.6348
     assert_eq!(sym.value, 0x10010c98);
     assert_eq!(sym.size, 1);
-    assert_eq!(sym.bind, STB_LOCAL);
-    assert_eq!(sym.stype, STT_OBJECT);
+    assert_eq!(sym.bind, constant::STB_LOCAL);
+    assert_eq!(sym.stype, constant::STT_OBJECT);
     assert_eq!(sym.shndx, 24);
     assert_eq!(sym.name, "completed.6348");
 
@@ -134,8 +134,8 @@ fn sym_be_64() -> io::Result<()> {
     // 24: 000000000001fc18   108 FUNC    GLOBAL DEFAULT   21 error
     assert_eq!(sym.value, 0x1fc18);
     assert_eq!(sym.size, 108);
-    assert_eq!(sym.bind, STB_GLOBAL);
-    assert_eq!(sym.stype, STT_FUNC);
+    assert_eq!(sym.bind, constant::STB_GLOBAL);
+    assert_eq!(sym.stype, constant::STT_FUNC);
     assert_eq!(sym.shndx, 21);
     assert_eq!(sym.name, "error");
 

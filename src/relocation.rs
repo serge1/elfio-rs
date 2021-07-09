@@ -87,27 +87,27 @@ struct Elf64Rela {
 /// fn main() -> io::Result<()> {
 ///     let elf_file = File::open("tests/files/hello_64")?;
 ///     let mut reader = BufReader::new(elf_file);
-/// 
+///
 ///     let mut elf = Elfio::new();
-/// 
+///
 ///     elf.load(&mut reader)?;
-/// 
+///
 ///     let section = match elf.get_section_by_name(&".rela.plt") {
 ///         Some(s) => s,
 ///         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
 ///     };
-/// 
+///
 ///     let relocs = elfio::RelocationSectionAccessor::new(&elf, section);
-/// 
+///
 ///     assert_eq!(relocs.get_entries_num(), 2);
-/// 
+///
 ///     // 000000600850  000300000007 R_X86_64_JUMP_SLO 0000000000000000 __libc_start_main@GLIBC_2.2.5 + 0
 ///     let rel = relocs.get_entry(1).unwrap();
 ///     assert_eq!(rel.offset, 0x000000600850);
 ///     assert_eq!(rel.symbol, 3);
 ///     assert_eq!(rel.rtype, 7);
 ///     assert_eq!(rel.addend, Some(0));
-/// 
+///
 ///     Ok(())
 /// }
 /// ```
@@ -147,7 +147,7 @@ impl<'a> RelocationSectionAccessor<'a> {
 
         let converter = self.elfio.get_converter();
 
-        if self.elfio.get_class() == ELFCLASS64 {
+        if self.elfio.get_class() == constant::ELFCLASS64 {
             let mut entry: Elf64Rela = Default::default();
             entry.r_offset = converter.convert(u64::from_ne_bytes(
                 <[u8; 8]>::try_from(&entry_area[0..8])
@@ -157,7 +157,7 @@ impl<'a> RelocationSectionAccessor<'a> {
                 <[u8; 8]>::try_from(&entry_area[8..16])
                     .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
             ));
-            if self.section.get_type() == SHT_RELA {
+            if self.section.get_type() == constant::SHT_RELA {
                 entry.r_addend = converter.convert(i64::from_ne_bytes(
                     <[u8; 8]>::try_from(&entry_area[16..24])
                         .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
@@ -168,7 +168,7 @@ impl<'a> RelocationSectionAccessor<'a> {
                 offset: entry.r_offset as Elf64Addr,
                 symbol: (entry.r_info >> 32) as ElfWord,
                 rtype:  (entry.r_info & 0xFFFFFFFFu64) as ElfWord,
-                addend: if self.section.get_type() == SHT_RELA {
+                addend: if self.section.get_type() == constant::SHT_RELA {
                     Some(entry.r_addend as ElfSxword)
                 } else {
                     None
@@ -182,7 +182,7 @@ impl<'a> RelocationSectionAccessor<'a> {
             entry.r_info = converter.convert(u32::from_ne_bytes(
                 <[u8; 4]>::try_from(&entry_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
             ));
-            if self.section.get_type() == SHT_RELA {
+            if self.section.get_type() == constant::SHT_RELA {
                 entry.r_addend = converter.convert(i32::from_ne_bytes(
                     <[u8; 4]>::try_from(&entry_area[8..12]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
                 ));
@@ -192,7 +192,7 @@ impl<'a> RelocationSectionAccessor<'a> {
                 offset: entry.r_offset as Elf64Addr,
                 symbol: (entry.r_info >> 8) as ElfWord,
                 rtype:  (entry.r_info & 0xFFu32) as ElfWord,
-                addend: if self.section.get_type() == SHT_RELA {
+                addend: if self.section.get_type() == constant::SHT_RELA {
                     Some(entry.r_addend as ElfSxword)
                 } else {
                     None

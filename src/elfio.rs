@@ -60,10 +60,10 @@ THE SOFTWARE.
 //!     elf.load(&mut file_reader)?;
 //!
 //!     match elf.get_type() {
-//!         elfio::ET_REL => println!("Object ELF file"),
-//!         elfio::ET_EXEC => println!("Executable ELF file"),
-//!         elfio::ET_DYN => println!("Shared library ELF file"),
-//!         elfio::ET_CORE => println!("Core ELF file"),
+//!         elfio::constant::ET_REL => println!("Object ELF file"),
+//!         elfio::constant::ET_EXEC => println!("Executable ELF file"),
+//!         elfio::constant::ET_DYN => println!("Shared library ELF file"),
+//!         elfio::constant::ET_CORE => println!("Core ELF file"),
 //!         _ => println!("ELF type is not recognized"),
 //!     }
 //!
@@ -127,14 +127,14 @@ impl Elfio {
     /// Create a new instance with defined encoding and endianess
     pub fn new_(encoding: u8, endianess: u8) -> Self {
         Elfio {
-            converter: if (endianess == ELFDATA2LSB && cfg!(target_endian = "little"))
-                || endianess == ELFDATA2MSB && cfg!(target_endian = "big")
+            converter: if (endianess == constant::ELFDATA2LSB && cfg!(target_endian = "little"))
+                || endianess == constant::ELFDATA2MSB && cfg!(target_endian = "big")
             {
                 utils::Converter { is_needed: false }
             } else {
                 utils::Converter { is_needed: true }
             },
-            header:    if encoding == ELFCLASS64 {
+            header:    if encoding == constant::ELFCLASS64 {
                 Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new())
             } else {
                 Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new())
@@ -151,16 +151,16 @@ impl Elfio {
 
     /// Load the ELF file from input stream
     pub fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
-        let mut e_ident: [u8; EI_NIDENT] = [0; EI_NIDENT];
+        let mut e_ident: [u8; constant::EI_NIDENT] = [0; constant::EI_NIDENT];
         // Read ELF file signature
         reader.read_exact(&mut e_ident)?;
         reader.seek(io::SeekFrom::Start(0))?;
 
         // Is it ELF file?
-        if e_ident[EI_MAG0] != ELFMAG0
-            || e_ident[EI_MAG1] != ELFMAG1
-            || e_ident[EI_MAG2] != ELFMAG2
-            || e_ident[EI_MAG3] != ELFMAG3
+        if e_ident[constant::EI_MAG0] != constant::ELFMAG0
+            || e_ident[constant::EI_MAG1] != constant::ELFMAG1
+            || e_ident[constant::EI_MAG2] != constant::ELFMAG2
+            || e_ident[constant::EI_MAG3] != constant::ELFMAG3
         {
             return Err(io::Error::new(
                 io::ErrorKind::Other,
@@ -168,28 +168,33 @@ impl Elfio {
             ));
         }
 
-        if e_ident[EI_CLASS] != ELFCLASS64 && e_ident[EI_CLASS] != ELFCLASS32 {
+        if e_ident[constant::EI_CLASS] != constant::ELFCLASS64
+            && e_ident[constant::EI_CLASS] != constant::ELFCLASS32
+        {
             return Err(io::Error::new(
                 io::ErrorKind::Other,
                 "Unknown ELF class value",
             ));
         }
 
-        if e_ident[EI_DATA] != ELFDATA2LSB && e_ident[EI_DATA] != ELFDATA2MSB {
+        if e_ident[constant::EI_DATA] != constant::ELFDATA2LSB
+            && e_ident[constant::EI_DATA] != constant::ELFDATA2MSB
+        {
             return Err(io::Error::new(
                 io::ErrorKind::Other,
                 "Unknown ELF file endianess",
             ));
         }
 
-        if e_ident[EI_CLASS] == ELFCLASS64 {
+        if e_ident[constant::EI_CLASS] == constant::ELFCLASS64 {
             self.header = Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new());
         } else {
             self.header = Box::new(ElfHeader::<Elf32Addr, Elf32Off>::new());
         }
 
-        if (cfg!(target_endian = "little") && (e_ident[EI_DATA] == ELFDATA2LSB))
-            || (cfg!(target_endian = "big") && (e_ident[EI_DATA] == ELFDATA2MSB))
+        if (cfg!(target_endian = "little") && (e_ident[constant::EI_DATA] == constant::ELFDATA2LSB))
+            || (cfg!(target_endian = "big")
+                && (e_ident[constant::EI_DATA] == constant::ELFDATA2MSB))
         {
             self.converter.is_needed = false;
         } else {
@@ -252,7 +257,7 @@ impl Elfio {
         }
 
         let shstrndx = self.get_section_name_str_index();
-        if shstrndx != SHN_UNDEF {
+        if shstrndx != constant::SHN_UNDEF {
             for i in 1..num {
                 let pos = self.sections[i as usize].get_name_string_offset();
                 let acc = StringSectionAccessor::new(&*self.sections[shstrndx as usize]);
@@ -265,7 +270,7 @@ impl Elfio {
     }
 
     fn create_section(&self) -> Box<dyn ElfSectionTrait> {
-        let section: Box<dyn ElfSectionTrait> = if self.header.get_class() == ELFCLASS64 {
+        let section: Box<dyn ElfSectionTrait> = if self.header.get_class() == constant::ELFCLASS64 {
             Box::new(ElfSection::<Elf64Addr, Elf64Off, ElfXword>::new(
                 &self.converter,
             ))
@@ -294,7 +299,7 @@ impl Elfio {
     }
 
     fn create_segment(&self) -> Box<dyn ElfSegmentTrait> {
-        let segment: Box<dyn ElfSegmentTrait> = if self.header.get_class() == ELFCLASS64 {
+        let segment: Box<dyn ElfSegmentTrait> = if self.header.get_class() == constant::ELFCLASS64 {
             Box::new(ElfSegment::<Elf64Addr, Elf64Off, ElfXword>::new(
                 &self.converter,
                 self.header.get_class(),

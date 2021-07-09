@@ -59,7 +59,7 @@ pub trait ElfHeaderTrait: ElfHeaderAccessTrait + Load {}
 #[repr(C)]
 #[derive(Debug)]
 pub struct ElfHeader<Addr, Offset> {
-    e_ident:     [u8; EI_NIDENT],
+    e_ident:     [u8; constant::EI_NIDENT],
     e_type:      ElfHalf,
     e_machine:   ElfHalf,
     e_version:   ElfWord,
@@ -89,13 +89,13 @@ where
             converter: Converter { is_needed: false },
 
             e_ident:     [
-                ELFMAG0,
-                ELFMAG1,
-                ELFMAG2,
-                ELFMAG3,
-                ELFCLASSNONE,
-                ELFDATANONE,
-                EV_NONE,
+                constant::ELFMAG0,
+                constant::ELFMAG1,
+                constant::ELFMAG2,
+                constant::ELFMAG3,
+                constant::ELFCLASSNONE,
+                constant::ELFDATANONE,
+                constant::EV_NONE,
                 0,
                 0,
                 0,
@@ -143,16 +143,16 @@ where
     Offset: Zero + Load + AsPrimitive<u64>,
     Converter: Convert<Addr> + Convert<Offset>,
 {
-    ELFIO_GET_ACCESS!(u8, class, e_ident[EI_CLASS]);
-    ELFIO_GET_ACCESS!(u8, elf_version, e_ident[EI_VERSION]);
-    ELFIO_GET_ACCESS!(u8, encoding, e_ident[EI_DATA]);
+    ELFIO_GET_ACCESS!(u8, class, e_ident[constant::EI_CLASS]);
+    ELFIO_GET_ACCESS!(u8, elf_version, e_ident[constant::EI_VERSION]);
+    ELFIO_GET_ACCESS!(u8, encoding, e_ident[constant::EI_DATA]);
     ELFIO_GET_ACCESS!(ElfHalf, header_size, e_ehsize);
     ELFIO_GET_ACCESS!(ElfHalf, section_entry_size, e_shentsize);
     ELFIO_GET_ACCESS!(ElfHalf, segment_entry_size, e_phentsize);
 
     ELFIO_GET_SET_ACCESS!(ElfWord, version, e_version);
-    ELFIO_GET_SET_ACCESS!(u8, os_abi, e_ident[EI_OSABI]);
-    ELFIO_GET_SET_ACCESS!(u8, abi_version, e_ident[EI_ABIVERSION]);
+    ELFIO_GET_SET_ACCESS!(u8, os_abi, e_ident[constant::EI_OSABI]);
+    ELFIO_GET_SET_ACCESS!(u8, abi_version, e_ident[constant::EI_ABIVERSION]);
     ELFIO_GET_SET_ACCESS!(ElfHalf, type, e_type);
     ELFIO_GET_SET_ACCESS!(ElfHalf, machine, e_machine);
     ELFIO_GET_SET_ACCESS!(ElfWord, flags, e_flags);

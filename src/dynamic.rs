@@ -62,20 +62,20 @@ struct Elf64Dyn {
 /// fn main() -> io::Result<()> {
 ///     let elf_file = File::open("tests/files/hello_32")?;
 ///     let mut reader = BufReader::new(elf_file);
-/// 
+///
 ///     let mut elf = Elfio::new();
-/// 
+///
 ///     elf.load(&mut reader)?;
-/// 
+///
 ///     let section = match elf.get_section_by_name(&".dynamic") {
 ///         Some(s) => s,
 ///         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
 ///     };
-/// 
+///
 ///     let dyns = elfio::DynamicSectionAccessor::new(&elf, section);
-/// 
+///
 ///     assert_eq!(dyns.get_entries_num(), 20);
-/// 
+///
 ///     // Dynamic section at offset 0x4a0 contains 20 entries:
 ///     //   Tag        Type                         Name/Value
 ///     //  0x00000001 (NEEDED)                     Shared library: [libc.so.6]
@@ -106,7 +106,7 @@ impl<'a> DynamicSectionAccessor<'a> {
 
         for i in 0..max_entries {
             let entry = self.get_entry(i).unwrap();
-            if entry.tag == DT_NULL {
+            if entry.tag == constant::DT_NULL {
                 return i + 1;
             }
         }
@@ -136,7 +136,7 @@ impl<'a> DynamicSectionAccessor<'a> {
 
         let converter = self.elfio.get_converter();
 
-        if self.elfio.get_class() == ELFCLASS64 {
+        if self.elfio.get_class() == constant::ELFCLASS64 {
             let mut entry: Elf64Dyn = Default::default();
             entry.d_tag = converter.convert(i64::from_ne_bytes(
                 <[u8; 8]>::try_from(&entry_area[0..8])

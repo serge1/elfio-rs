@@ -98,8 +98,8 @@ struct Elf64Sym {
 ///     let sym = symtab.get_symbol(30).unwrap();
 ///     assert_eq!(sym.value, 0x08049588);
 ///     assert_eq!(sym.size, 4);
-///     assert_eq!(sym.bind, elfio::STB_LOCAL);
-///     assert_eq!(sym.stype, elfio::STT_OBJECT);
+///     assert_eq!(sym.bind, elfio::constant::STB_LOCAL);
+///     assert_eq!(sym.stype, elfio::constant::STT_OBJECT);
 ///     assert_eq!(sym.shndx, 23);
 ///     assert_eq!(sym.name, "dtor_idx.5805");
 ///
@@ -139,7 +139,7 @@ impl<'a> SymbolSectionAccessor<'a> {
 
         let converter = self.elfio.get_converter();
 
-        if self.elfio.get_class() == ELFCLASS64 {
+        if self.elfio.get_class() == constant::ELFCLASS64 {
             let mut sym: Elf64Sym = Default::default();
             sym.st_name = converter.convert(u32::from_ne_bytes(
                 <[u8; 4]>::try_from(&symbol_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),

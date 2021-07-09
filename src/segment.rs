@@ -122,7 +122,7 @@ where
 {
     fn load(&mut self, reader: &mut (dyn ElfioReadSeek)) -> io::Result<()> {
         self.p_type.load(reader)?;
-        if self.class == ELFCLASS64 {
+        if self.class == constant::ELFCLASS64 {
             self.p_flags.load(reader)?;
             self.p_offset.load(reader)?;
             self.p_vaddr.load(reader)?;

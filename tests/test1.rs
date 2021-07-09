@@ -35,16 +35,16 @@ fn read_le_32() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    assert_eq!(elf.get_class(), elfio::ELFCLASS32);
+    assert_eq!(elf.get_class(), elfio::constant::ELFCLASS32);
     assert_eq!(elf.get_elf_version(), 1);
-    assert_eq!(elf.get_encoding(), elfio::ELFDATA2LSB);
+    assert_eq!(elf.get_encoding(), elfio::constant::ELFDATA2LSB);
     assert_eq!(elf.get_header_size(), 52);
     assert_eq!(elf.get_section_entry_size(), 40);
     assert_eq!(elf.get_segment_entry_size(), 32);
     assert_eq!(elf.get_version(), 1);
     assert_eq!(elf.get_os_abi(), 0);
     assert_eq!(elf.get_abi_version(), 0);
-    assert_eq!(elf.get_type(), elfio::ET_EXEC);
+    assert_eq!(elf.get_type(), elfio::constant::ET_EXEC);
     assert_eq!(elf.get_machine(), 3);
     assert_eq!(elf.get_flags(), 0);
     assert_eq!(elf.get_entry(), 0x80482b0);
@@ -71,8 +71,11 @@ fn read_le_32() -> io::Result<()> {
 
     let section = sections.get(12).unwrap();
     assert_eq!(section.get_name(), ".text");
-    assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
-    assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_EXECINSTR);
+    assert_eq!(section.get_type(), elfio::constant::SHT_PROGBITS);
+    assert_eq!(
+        section.get_flags(),
+        elfio::constant::SHF_ALLOC + elfio::constant::SHF_EXECINSTR
+    );
     assert_eq!(section.get_info(), 0);
     assert_eq!(section.get_link(), 0);
     assert_eq!(section.get_addr_align(), 16);
@@ -90,8 +93,11 @@ fn read_le_32() -> io::Result<()> {
 
     let section = sections.get(19).unwrap();
     assert_eq!(section.get_name(), ".dynamic");
-    assert_eq!(section.get_type(), elfio::SHT_DYNAMIC);
-    assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_WRITE);
+    assert_eq!(section.get_type(), elfio::constant::SHT_DYNAMIC);
+    assert_eq!(
+        section.get_flags(),
+        elfio::constant::SHF_ALLOC + elfio::constant::SHF_WRITE
+    );
     assert_eq!(section.get_info(), 0);
     assert_eq!(section.get_link(), 5);
     assert_eq!(section.get_addr_align(), 4);
@@ -104,33 +110,39 @@ fn read_le_32() -> io::Result<()> {
     assert_eq!(segments.len(), 7);
 
     let segment = segments.get(0).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_PHDR);
+    assert_eq!(segment.get_type(), elfio::constant::PT_PHDR);
     assert_eq!(segment.get_offset(), 0x000034);
     assert_eq!(segment.get_virtual_address(), 0x08048034);
     assert_eq!(segment.get_physical_address(), 0x08048034);
     assert_eq!(segment.get_file_size(), 0x000e0);
     assert_eq!(segment.get_memory_size(), 0x000e0);
-    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_X);
+    assert_eq!(
+        segment.get_flags(),
+        elfio::constant::PF_R + elfio::constant::PF_X
+    );
     assert_eq!(segment.get_align(), 4);
 
     let segment = segments.get(1).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_INTERP);
+    assert_eq!(segment.get_type(), elfio::constant::PT_INTERP);
     assert_eq!(segment.get_offset(), 0x000114);
     assert_eq!(segment.get_virtual_address(), 0x08048114);
     assert_eq!(segment.get_physical_address(), 0x08048114);
     assert_eq!(segment.get_file_size(), 0x00013);
     assert_eq!(segment.get_memory_size(), 0x00013);
-    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_flags(), elfio::constant::PF_R);
     assert_eq!(segment.get_align(), 1);
 
     let segment = segments.get(4).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_DYNAMIC);
+    assert_eq!(segment.get_type(), elfio::constant::PT_DYNAMIC);
     assert_eq!(segment.get_offset(), 0x0004a0);
     assert_eq!(segment.get_virtual_address(), 0x080494a0);
     assert_eq!(segment.get_physical_address(), 0x080494a0);
     assert_eq!(segment.get_file_size(), 0x000c8);
     assert_eq!(segment.get_memory_size(), 0x000c8);
-    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_W);
+    assert_eq!(
+        segment.get_flags(),
+        elfio::constant::PF_R + elfio::constant::PF_W
+    );
     assert_eq!(segment.get_align(), 4);
 
     Ok(())
@@ -145,16 +157,16 @@ fn read_le_64() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    assert_eq!(elf.get_class(), elfio::ELFCLASS64);
+    assert_eq!(elf.get_class(), elfio::constant::ELFCLASS64);
     assert_eq!(elf.get_elf_version(), 1);
-    assert_eq!(elf.get_encoding(), elfio::ELFDATA2LSB);
+    assert_eq!(elf.get_encoding(), elfio::constant::ELFDATA2LSB);
     assert_eq!(elf.get_header_size(), 64);
     assert_eq!(elf.get_section_entry_size(), 64);
     assert_eq!(elf.get_segment_entry_size(), 56);
     assert_eq!(elf.get_version(), 1);
     assert_eq!(elf.get_os_abi(), 0);
     assert_eq!(elf.get_abi_version(), 0);
-    assert_eq!(elf.get_type(), elfio::ET_EXEC);
+    assert_eq!(elf.get_type(), elfio::constant::ET_EXEC);
     assert_eq!(elf.get_machine(), 62);
     assert_eq!(elf.get_flags(), 0);
     assert_eq!(elf.get_entry(), 0x4003c0);
@@ -180,8 +192,8 @@ fn read_le_64() -> io::Result<()> {
 
     let section = sections.get(1).unwrap();
     assert_eq!(section.get_name(), ".interp");
-    assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
-    assert_eq!(section.get_flags(), elfio::SHF_ALLOC);
+    assert_eq!(section.get_type(), elfio::constant::SHT_PROGBITS);
+    assert_eq!(section.get_flags(), elfio::constant::SHF_ALLOC);
     assert_eq!(section.get_info(), 0);
     assert_eq!(section.get_link(), 0);
     assert_eq!(section.get_addr_align(), 1);
@@ -194,33 +206,39 @@ fn read_le_64() -> io::Result<()> {
     assert_eq!(segments.len(), 8);
 
     let segment = segments.get(0).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_PHDR);
+    assert_eq!(segment.get_type(), elfio::constant::PT_PHDR);
     assert_eq!(segment.get_offset(), 0x000040);
     assert_eq!(segment.get_virtual_address(), 0x0000000000400040);
     assert_eq!(segment.get_physical_address(), 0x0000000000400040);
     assert_eq!(segment.get_file_size(), 0x00000000000001c0);
     assert_eq!(segment.get_memory_size(), 0x00000000000001c0);
-    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_X);
+    assert_eq!(
+        segment.get_flags(),
+        elfio::constant::PF_R + elfio::constant::PF_X
+    );
     assert_eq!(segment.get_align(), 8);
 
     let segment = segments.get(1).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_INTERP);
+    assert_eq!(segment.get_type(), elfio::constant::PT_INTERP);
     assert_eq!(segment.get_offset(), 0x000200);
     assert_eq!(segment.get_virtual_address(), 0x400200);
     assert_eq!(segment.get_physical_address(), 0x400200);
     assert_eq!(segment.get_file_size(), 0x0001c);
     assert_eq!(segment.get_memory_size(), 0x0001c);
-    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_flags(), elfio::constant::PF_R);
     assert_eq!(segment.get_align(), 1);
 
     let segment = segments.get(4).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_DYNAMIC);
+    assert_eq!(segment.get_type(), elfio::constant::PT_DYNAMIC);
     assert_eq!(segment.get_offset(), 0x0000000000000698);
     assert_eq!(segment.get_virtual_address(), 0x0000000000600698);
     assert_eq!(segment.get_physical_address(), 0x0000000000600698);
     assert_eq!(segment.get_file_size(), 0x0000000000000190);
     assert_eq!(segment.get_memory_size(), 0x0000000000000190);
-    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_W);
+    assert_eq!(
+        segment.get_flags(),
+        elfio::constant::PF_R + elfio::constant::PF_W
+    );
     assert_eq!(segment.get_align(), 8);
 
     Ok(())
@@ -228,7 +246,7 @@ fn read_le_64() -> io::Result<()> {
 
 #[test]
 fn write_read_le_32() -> io::Result<()> {
-    let mut elf = Elfio::new_(elfio::ELFCLASS32, elfio::ELFDATA2LSB);
+    let mut elf = Elfio::new_(elfio::constant::ELFCLASS32, elfio::constant::ELFDATA2LSB);
 
     elf.set_version(1000);
     elf.set_os_abi(83);
@@ -261,7 +279,7 @@ fn write_read_le_32() -> io::Result<()> {
 
 #[test]
 fn write_read_le_64() -> io::Result<()> {
-    let mut elf = Elfio::new_(elfio::ELFCLASS64, elfio::ELFDATA2MSB);
+    let mut elf = Elfio::new_(elfio::constant::ELFCLASS64, elfio::constant::ELFDATA2MSB);
 
     elf.set_version(1000);
     elf.set_os_abi(83);
@@ -301,16 +319,16 @@ fn read_be_ppc32() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    assert_eq!(elf.get_class(), elfio::ELFCLASS32);
+    assert_eq!(elf.get_class(), elfio::constant::ELFCLASS32);
     assert_eq!(elf.get_elf_version(), 1);
-    assert_eq!(elf.get_encoding(), elfio::ELFDATA2MSB);
+    assert_eq!(elf.get_encoding(), elfio::constant::ELFDATA2MSB);
     assert_eq!(elf.get_header_size(), 52);
     assert_eq!(elf.get_section_entry_size(), 40);
     assert_eq!(elf.get_segment_entry_size(), 32);
     assert_eq!(elf.get_version(), 1);
     assert_eq!(elf.get_os_abi(), 0);
     assert_eq!(elf.get_abi_version(), 0);
-    assert_eq!(elf.get_type(), elfio::ET_EXEC);
+    assert_eq!(elf.get_type(), elfio::constant::ET_EXEC);
     assert_eq!(elf.get_machine(), 20);
     assert_eq!(elf.get_flags(), 0);
     assert_eq!(elf.get_entry(), 0x10000550);
@@ -332,16 +350,16 @@ fn read_be_ppc64() -> io::Result<()> {
 
     elf.load(&mut reader)?;
 
-    assert_eq!(elf.get_class(), elfio::ELFCLASS64);
+    assert_eq!(elf.get_class(), elfio::constant::ELFCLASS64);
     assert_eq!(elf.get_elf_version(), 1);
-    assert_eq!(elf.get_encoding(), elfio::ELFDATA2MSB);
+    assert_eq!(elf.get_encoding(), elfio::constant::ELFDATA2MSB);
     assert_eq!(elf.get_header_size(), 64);
     assert_eq!(elf.get_section_entry_size(), 64);
     assert_eq!(elf.get_segment_entry_size(), 56);
     assert_eq!(elf.get_version(), 1);
     assert_eq!(elf.get_os_abi(), 0);
     assert_eq!(elf.get_abi_version(), 0);
-    assert_eq!(elf.get_type(), elfio::ET_DYN);
+    assert_eq!(elf.get_type(), elfio::constant::ET_DYN);
     assert_eq!(elf.get_machine(), 21);
     assert_eq!(elf.get_flags(), 1);
     assert_eq!(elf.get_entry(), 0x1fa80);
@@ -366,8 +384,11 @@ fn read_be_ppc64() -> io::Result<()> {
 
     let section = sections.get(24).unwrap();
     assert_eq!(section.get_name(), ".data");
-    assert_eq!(section.get_type(), elfio::SHT_PROGBITS);
-    assert_eq!(section.get_flags(), elfio::SHF_ALLOC + elfio::SHF_WRITE);
+    assert_eq!(section.get_type(), elfio::constant::SHT_PROGBITS);
+    assert_eq!(
+        section.get_flags(),
+        elfio::constant::SHF_ALLOC + elfio::constant::SHF_WRITE
+    );
     assert_eq!(section.get_info(), 0);
     assert_eq!(section.get_link(), 0);
     assert_eq!(section.get_addr_align(), 8);
@@ -388,33 +409,36 @@ fn read_be_ppc64() -> io::Result<()> {
     assert_eq!(segments.len(), 8);
 
     let segment = segments.get(0).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_PHDR);
+    assert_eq!(segment.get_type(), elfio::constant::PT_PHDR);
     assert_eq!(segment.get_offset(), 0x000040);
     assert_eq!(segment.get_virtual_address(), 0x0000000000000040);
     assert_eq!(segment.get_physical_address(), 0x0000000000000040);
     assert_eq!(segment.get_file_size(), 0x00000000000001c0);
     assert_eq!(segment.get_memory_size(), 0x00000000000001c0);
-    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_flags(), elfio::constant::PF_R);
     assert_eq!(segment.get_align(), 8);
 
     let segment = segments.get(1).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_INTERP);
+    assert_eq!(segment.get_type(), elfio::constant::PT_INTERP);
     assert_eq!(segment.get_offset(), 0x000200);
     assert_eq!(segment.get_virtual_address(), 0x200);
     assert_eq!(segment.get_physical_address(), 0x200);
     assert_eq!(segment.get_file_size(), 0x00011);
     assert_eq!(segment.get_memory_size(), 0x00011);
-    assert_eq!(segment.get_flags(), elfio::PF_R);
+    assert_eq!(segment.get_flags(), elfio::constant::PF_R);
     assert_eq!(segment.get_align(), 1);
 
     let segment = segments.get(4).unwrap();
-    assert_eq!(segment.get_type(), elfio::PT_DYNAMIC);
+    assert_eq!(segment.get_type(), elfio::constant::PT_DYNAMIC);
     assert_eq!(segment.get_offset(), 0x000000000000f880);
     assert_eq!(segment.get_virtual_address(), 0x000000000001f880);
     assert_eq!(segment.get_physical_address(), 0x000000000001f880);
     assert_eq!(segment.get_file_size(), 0x0000000000000200);
     assert_eq!(segment.get_memory_size(), 0x0000000000000200);
-    assert_eq!(segment.get_flags(), elfio::PF_R + elfio::PF_W);
+    assert_eq!(
+        segment.get_flags(),
+        elfio::constant::PF_R + elfio::constant::PF_W
+    );
     assert_eq!(segment.get_align(), 8);
 
     Ok(())

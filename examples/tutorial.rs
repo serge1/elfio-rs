@@ -35,22 +35,22 @@ fn main() -> io::Result<()> {
     elf.load(&mut reader)?;
 
     match elf.get_type() {
-        elfio::ET_REL => println!("Object ELF file"),
-        elfio::ET_EXEC => println!("Executable ELF file"),
-        elfio::ET_DYN => println!("Shared library ELF file"),
-        elfio::ET_CORE => println!("Core ELF file"),
+        elfio::constant::ET_REL => println!("Object ELF file"),
+        elfio::constant::ET_EXEC => println!("Executable ELF file"),
+        elfio::constant::ET_DYN => println!("Shared library ELF file"),
+        elfio::constant::ET_CORE => println!("Core ELF file"),
         _ => println!("ELF type is not recognized"),
     }
 
     match elf.get_class() {
-        elfio::ELFCLASS32 => println!("32-bit ELF file"),
-        elfio::ELFCLASS64 => println!("64-bit ELF file"),
+        elfio::constant::ELFCLASS32 => println!("32-bit ELF file"),
+        elfio::constant::ELFCLASS64 => println!("64-bit ELF file"),
         _ => println!("ELF class is not recognized"),
     }
 
     match elf.get_encoding() {
-        elfio::ELFDATA2LSB => println!("LSB ELF file"),
-        elfio::ELFDATA2MSB => println!("MSB ELF file"),
+        elfio::constant::ELFDATA2LSB => println!("LSB ELF file"),
+        elfio::constant::ELFDATA2MSB => println!("MSB ELF file"),
         _ => println!("ELF endianess is not recognized"),
     }
 
