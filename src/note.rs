@@ -95,7 +95,7 @@ impl<'a> NoteSectionAccessor<'a> {
 
         let data = section.get_data();
         let size = data.len();
-        if data.len() == 0 {
+        if data.is_empty() {
             return note_accessor;
         }
 
@@ -163,10 +163,7 @@ impl<'a> NoteSectionAccessor<'a> {
             },
             description: {
                 let desc_pos = 12 + ((name_size as usize + align - 1) / align) * align;
-                area[desc_pos..desc_pos + desc_size as usize]
-                    .iter()
-                    .cloned()
-                    .collect()
+                area[desc_pos..desc_pos + desc_size as usize].to_vec()
             },
         })
     }

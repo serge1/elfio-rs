@@ -150,7 +150,7 @@ impl Elfio {
 
     /// Returns a reference for an endianess converter used for the current file
     pub fn get_converter(&self) -> &utils::Converter {
-        return &self.converter;
+        &self.converter
     }
 
     /// Load the ELF file from input stream
@@ -264,7 +264,7 @@ impl Elfio {
         if shstrndx != constant::SHN_UNDEF {
             for i in 1..num {
                 let pos = self.sections[i as usize].get_name_string_offset();
-                let acc = StringSectionAccessor::new(&self, &*self.sections[shstrndx as usize]);
+                let acc = StringSectionAccessor::new(self, &*self.sections[shstrndx as usize]);
                 let name = acc.get_string(pos);
                 self.sections[i as usize].set_name(&name);
             }

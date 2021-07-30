@@ -13,14 +13,19 @@ called [**ELFIO**](https://github.com/serge1/ELFIO)
 Work in progress. Only ELF file reader is implemented so far.
 Your contribution is welcomed!
 
-## Documentation
+## Documentation and Tutorial
 
 Use **cargo** to produce the library documentation:
 
     cargo doc
 
-## Licensed under either of these:
+Tutorial is available as an example source code. To compile the tutorial
+use the following **cargo** command:
 
-- MIT license (LICENSE-MIT or https://opensource.org/licenses/MIT)
+    cargo test --example tutorial
 
-- Apache License, Version 2.0, (LICENSE-APACHE or https://www.apache.org/licenses/LICENSE-2.0)
+## Licensed under either of these
+
+- MIT license (LICENSE-MIT or <https://opensource.org/licenses/MIT>)
+
+- Apache License, Version 2.0, (LICENSE-APACHE or <https://www.apache.org/licenses/LICENSE-2.0>)

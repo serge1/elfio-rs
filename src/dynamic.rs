@@ -137,28 +137,30 @@ impl<'a> DynamicSectionAccessor<'a> {
         let converter = self.elfio.get_converter();
 
         if self.elfio.get_class() == constant::ELFCLASS64 {
-            let mut entry: Elf64Dyn = Default::default();
-            entry.d_tag = converter.convert(i64::from_ne_bytes(
-                <[u8; 8]>::try_from(&entry_area[0..8])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            ));
-            entry.d_value = converter.convert(u64::from_ne_bytes(
-                <[u8; 8]>::try_from(&entry_area[8..16])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            ));
+            let entry = Elf64Dyn {
+                d_tag:   converter.convert(i64::from_ne_bytes(
+                    <[u8; 8]>::try_from(&entry_area[0..8])
+                        .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+                )),
+                d_value: converter.convert(u64::from_ne_bytes(
+                    <[u8; 8]>::try_from(&entry_area[8..16])
+                        .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+                )),
+            };
 
             Some(Dynamic {
                 tag:   entry.d_tag,
                 value: entry.d_value,
             })
         } else {
-            let mut entry: Elf32Dyn = Default::default();
-            entry.d_tag = converter.convert(i32::from_ne_bytes(
-                <[u8; 4]>::try_from(&entry_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
-            entry.d_value = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&entry_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
+            let entry = Elf32Dyn {
+                d_tag:   converter.convert(i32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&entry_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+                d_value: converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&entry_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+            };
 
             Some(Dynamic {
                 tag:   entry.d_tag as ElfSxword,

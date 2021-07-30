@@ -59,20 +59,20 @@ struct Elf64Array {
 /// fn main() -> io::Result<()> {
 ///     let elf_file = File::open("tests/files/hello_32")?;
 ///     let mut reader = BufReader::new(elf_file);
-/// 
+///
 ///     let mut elf = Elfio::new();
-/// 
+///
 ///     elf.load(&mut reader)?;
-/// 
+///
 ///     let section = match elf.get_section_by_name(&".ctors") {
 ///         Some(s) => s,
 ///         None => return Err(Error::new(io::ErrorKind::Other, "section not found")),
 ///     };
-/// 
+///
 ///     let array = elfio::ArraySectionAccessor::new(&elf, section);
-/// 
+///
 ///     assert_eq!(array.get_entries_num(), 2);
-/// 
+///
 ///     let element = array.get_entry(0).unwrap();
 ///     assert_eq!(element.value, 0xFFFFFFFF);
 ///     let element = array.get_entry(1).unwrap();
@@ -97,8 +97,7 @@ impl<'a> ArraySectionAccessor<'a> {
         let entry_size;
         if self.elfio.get_class() == constant::ELFCLASS64 {
             entry_size = 8;
-        }
-        else {
+        } else {
             entry_size = 4;
         }
 
@@ -119,8 +118,7 @@ impl<'a> ArraySectionAccessor<'a> {
         let entry_size;
         if self.elfio.get_class() == constant::ELFCLASS64 {
             entry_size = 8;
-        }
-        else {
+        } else {
             entry_size = 4;
         }
 
@@ -131,18 +129,20 @@ impl<'a> ArraySectionAccessor<'a> {
         let converter = self.elfio.get_converter();
 
         if self.elfio.get_class() == constant::ELFCLASS64 {
-            let mut entry: Elf64Array = Default::default();
-            entry.value = converter.convert(u64::from_ne_bytes(
-                <[u8; 8]>::try_from(&entry_area[0..8])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            ));
+            let entry = Elf64Array {
+                value: converter.convert(u64::from_ne_bytes(
+                    <[u8; 8]>::try_from(&entry_area[0..8])
+                        .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+                )),
+            };
 
             Some(Array { value: entry.value })
         } else {
-            let mut entry: Elf32Array = Default::default();
-            entry.value = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&entry_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
+            let entry = Elf32Array {
+                value: converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&entry_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+            };
 
             Some(Array {
                 value: entry.value as Elf64Addr,

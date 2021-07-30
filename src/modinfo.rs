@@ -112,12 +112,12 @@ impl<'a> ModInfoSectionAccessor<'a> {
     // --------------------------------------------------------------------------
     /// Get iterator over all modinfo entries
     pub fn get_iter(&self) -> Iter<String, String> {
-        return self.content.iter();
+        self.content.iter()
     }
 
     // --------------------------------------------------------------------------
     /// Retrieve a value by its key
-    pub fn get(&self, field: &String) -> Option<&String> {
+    pub fn get(&self, field: &str) -> Option<&String> {
         self.content.get(field)
     }
 }

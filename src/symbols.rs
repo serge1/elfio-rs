@@ -144,23 +144,24 @@ impl<'a> SymbolSectionAccessor<'a> {
         let converter = self.elfio.get_converter();
 
         if self.elfio.get_class() == constant::ELFCLASS64 {
-            let mut sym: Elf64Sym = Default::default();
-            sym.st_name = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&symbol_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
-            sym.st_info = converter.convert(symbol_area[4]);
-            sym.st_other = converter.convert(symbol_area[5]);
-            sym.st_shndx = converter.convert(u16::from_ne_bytes(
-                <[u8; 2]>::try_from(&symbol_area[6..8]).unwrap_or([0u8, 0u8]),
-            ));
-            sym.st_value = converter.convert(u64::from_ne_bytes(
-                <[u8; 8]>::try_from(&symbol_area[8..16])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            ));
-            sym.st_size = converter.convert(u64::from_ne_bytes(
-                <[u8; 8]>::try_from(&symbol_area[16..24])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            ));
+            let sym = Elf64Sym {
+                st_name:  converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&symbol_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+                st_info:  converter.convert(symbol_area[4]),
+                st_other: converter.convert(symbol_area[5]),
+                st_shndx: converter.convert(u16::from_ne_bytes(
+                    <[u8; 2]>::try_from(&symbol_area[6..8]).unwrap_or([0u8, 0u8]),
+                )),
+                st_value: converter.convert(u64::from_ne_bytes(
+                    <[u8; 8]>::try_from(&symbol_area[8..16])
+                        .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+                )),
+                st_size:  converter.convert(u64::from_ne_bytes(
+                    <[u8; 8]>::try_from(&symbol_area[16..24])
+                        .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+                )),
+            };
 
             let string_section = self
                 .elfio
@@ -169,30 +170,31 @@ impl<'a> SymbolSectionAccessor<'a> {
             let name = string_accessor.get_string(sym.st_name);
 
             Some(Symbol {
-                name:  name,
+                name,
                 value: sym.st_value,
-                size:  sym.st_size,
-                bind:  sym.st_info >> 4,
+                size: sym.st_size,
+                bind: sym.st_info >> 4,
                 stype: sym.st_info & 0xF,
                 other: sym.st_other,
                 shndx: sym.st_shndx,
             })
         } else {
-            let mut sym: Elf32Sym = Default::default();
-            sym.st_name = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&symbol_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
-            sym.st_value = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&symbol_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
-            sym.st_size = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&symbol_area[8..12]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
-            sym.st_info = converter.convert(symbol_area[12]);
-            sym.st_other = converter.convert(symbol_area[13]);
-            sym.st_shndx = converter.convert(u16::from_ne_bytes(
-                <[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]),
-            ));
+            let sym = Elf32Sym {
+                st_name:  converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&symbol_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+                st_value: converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&symbol_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+                st_size:  converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&symbol_area[8..12]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+                st_info:  converter.convert(symbol_area[12]),
+                st_other: converter.convert(symbol_area[13]),
+                st_shndx: converter.convert(u16::from_ne_bytes(
+                    <[u8; 2]>::try_from(&symbol_area[14..16]).unwrap_or([0u8, 0u8]),
+                )),
+            };
 
             let string_section = self
                 .elfio
@@ -201,10 +203,10 @@ impl<'a> SymbolSectionAccessor<'a> {
             let name = string_accessor.get_string(sym.st_name);
 
             Some(Symbol {
-                name:  name,
+                name,
                 value: sym.st_value as u64,
-                size:  sym.st_size as u64,
-                bind:  sym.st_info >> 4,
+                size: sym.st_size as u64,
+                bind: sym.st_info >> 4,
                 stype: sym.st_info & 0xF,
                 other: sym.st_other,
                 shndx: sym.st_shndx,

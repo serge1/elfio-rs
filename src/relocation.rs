@@ -148,15 +148,17 @@ impl<'a> RelocationSectionAccessor<'a> {
         let converter = self.elfio.get_converter();
 
         if self.elfio.get_class() == constant::ELFCLASS64 {
-            let mut entry: Elf64Rela = Default::default();
-            entry.r_offset = converter.convert(u64::from_ne_bytes(
-                <[u8; 8]>::try_from(&entry_area[0..8])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            ));
-            entry.r_info = converter.convert(u64::from_ne_bytes(
-                <[u8; 8]>::try_from(&entry_area[8..16])
-                    .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
-            ));
+            let mut entry = Elf64Rela {
+                r_offset: converter.convert(u64::from_ne_bytes(
+                    <[u8; 8]>::try_from(&entry_area[0..8])
+                        .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+                )),
+                r_info: converter.convert(u64::from_ne_bytes(
+                    <[u8; 8]>::try_from(&entry_area[8..16])
+                        .unwrap_or([0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]),
+                )),
+                ..Default::default()
+            };
             if self.section.get_type() == constant::SHT_RELA {
                 entry.r_addend = converter.convert(i64::from_ne_bytes(
                     <[u8; 8]>::try_from(&entry_area[16..24])
@@ -175,13 +177,15 @@ impl<'a> RelocationSectionAccessor<'a> {
                 },
             })
         } else {
-            let mut entry: Elf32Rela = Default::default();
-            entry.r_offset = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&entry_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
-            entry.r_info = converter.convert(u32::from_ne_bytes(
-                <[u8; 4]>::try_from(&entry_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
-            ));
+            let mut entry = Elf32Rela {
+                r_offset: converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&entry_area[0..4]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+                r_info: converter.convert(u32::from_ne_bytes(
+                    <[u8; 4]>::try_from(&entry_area[4..8]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
+                )),
+                ..Default::default()
+            };
             if self.section.get_type() == constant::SHT_RELA {
                 entry.r_addend = converter.convert(i32::from_ne_bytes(
                     <[u8; 4]>::try_from(&entry_area[8..12]).unwrap_or([0u8, 0u8, 0u8, 0u8]),
