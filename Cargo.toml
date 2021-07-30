@@ -1,6 +1,6 @@
 [package]
 name = "elfio"
-version = "0.3.3"
+version = "0.3.4"
 authors = ["Serge Lamikhov-Center <to_serge@hotmail.com>"]
 edition = "2018"
 description = "ELFIO is a Rust library intended for reading and generating files in the ELF binary format"
