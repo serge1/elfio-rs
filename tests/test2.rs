@@ -650,7 +650,10 @@ fn modinfo_le_32() -> io::Result<()> {
     let modinfo = ModInfoSectionAccessor::new(&elf, section);
 
     assert_eq!(modinfo.get_entries_num(), 10);
-    assert_eq!(modinfo.get(&"description".to_string()).unwrap(), "Platform-independent bitbanging I2C driver");
+    assert_eq!(
+        modinfo.get(&"description".to_string()).unwrap(),
+        "Platform-independent bitbanging I2C driver"
+    );
 
     Ok(())
 }
