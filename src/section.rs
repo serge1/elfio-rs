@@ -20,9 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use super::utils::*;
-use super::*;
 use num_traits::{AsPrimitive, Zero};
+use std::io;
+
+use super::types::*;
+use super::utils::*;
 
 // --------------------------------------------------------------------------
 /// Read/Write access to section properties

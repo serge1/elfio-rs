@@ -20,9 +20,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use super::utils::Convert;
-use super::*;
 use std::convert::TryFrom;
+
+use super::elfio::*;
+use super::section::*;
+use super::strings::*;
+use super::types::*;
+use super::utils::Convert;
 
 // --------------------------------------------------------------------------
 /// A struct represents a single symbol from symbol table section

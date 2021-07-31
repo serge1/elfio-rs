@@ -20,9 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use super::utils::Convert;
-use super::*;
 use std::convert::TryFrom;
+
+use super::elfio::*;
+use super::section::*;
+use super::types::*;
+use super::utils::Convert;
 
 /// A note entry. The note is used by compilers and other tools
 /// to mark an object file with special information that has special

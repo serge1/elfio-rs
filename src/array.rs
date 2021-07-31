@@ -20,9 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use super::utils::Convert;
-use super::*;
 use std::convert::TryFrom;
+
+use super::elfio::*;
+use super::section::*;
+use super::types::*;
+use super::utils::Convert;
 
 /// An array element
 ///

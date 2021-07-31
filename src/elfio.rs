@@ -36,72 +36,14 @@ THE SOFTWARE.
    limitations under the License.
 */
 
-#![warn(missing_docs)]
-
-//! 'elfio' is a Rust library intended for reading and generation
-//! files in the ELF binary format. The library supports processing
-//! of ELF files for 32- and 64-bit architectures regardless of their
-//! endianess
-//!
-//! For example:
-//! ```
-//! use std::fs::File;
-//! use std::io;
-//! use std::io::BufReader;
-//!
-//! use elfio::Elfio;
-//!
-//! fn main() -> io::Result<()> {
-//!     let elf_file = File::open("tests/files/hello_64")?;
-//!     let mut file_reader = BufReader::new(elf_file);
-//!
-//!     let mut elf = elfio::Elfio::new();
-//!
-//!     elf.load(&mut file_reader)?;
-//!
-//!     match elf.get_type() {
-//!         elfio::constant::ET_REL => println!("Object ELF file"),
-//!         elfio::constant::ET_EXEC => println!("Executable ELF file"),
-//!         elfio::constant::ET_DYN => println!("Shared library ELF file"),
-//!         elfio::constant::ET_CORE => println!("Core ELF file"),
-//!         _ => println!("ELF type is not recognized"),
-//!     }
-//!
-//!     Ok(())
-//! }
-//! ```
-
-#[macro_use]
-mod macros;
-
-mod array;
-mod dynamic;
-mod header;
-mod modinfo;
-mod note;
-mod relocation;
-mod section;
-mod segment;
-mod strings;
-mod symbols;
-mod types;
-mod utils;
-
-pub use array::*;
-pub use dynamic::*;
-use header::*;
-pub use modinfo::*;
-pub use note::*;
-pub use relocation::*;
-pub use section::ElfSectionAccessTrait;
-use section::*;
-pub use segment::ElfSegmentAccessTrait;
-use segment::*;
 use std::io;
-pub use strings::*;
-pub use symbols::*;
-pub use types::*;
-pub use utils::ElfioReadSeek;
+
+use super::header::*;
+use super::section::*;
+use super::segment::*;
+use super::strings::*;
+use super::types::*;
+use super::utils::*;
 
 /// Elfio - the main struct of the library. All access to ELF files attributes
 /// starts from this object.
@@ -111,7 +53,7 @@ pub use utils::ElfioReadSeek;
 // --------------------------------------------------------------------------
 pub struct Elfio {
     header:    Box<dyn ElfHeaderTrait>,
-    converter: utils::Converter,
+    converter: Converter,
     sections:  Vec<Box<dyn ElfSectionTrait>>,
     segments:  Vec<Box<dyn ElfSegmentTrait>>,
 }
@@ -121,7 +63,7 @@ impl Elfio {
     /// Create a new instance
     pub fn new() -> Self {
         Elfio {
-            converter: utils::Converter { is_needed: false },
+            converter: Converter { is_needed: false },
             header:    Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new()),
             sections:  Vec::new(),
             segments:  Vec::new(),
@@ -134,9 +76,9 @@ impl Elfio {
             converter: if (endianess == constant::ELFDATA2LSB && cfg!(target_endian = "little"))
                 || endianess == constant::ELFDATA2MSB && cfg!(target_endian = "big")
             {
-                utils::Converter { is_needed: false }
+                Converter { is_needed: false }
             } else {
-                utils::Converter { is_needed: true }
+                Converter { is_needed: true }
             },
             header:    if encoding == constant::ELFCLASS64 {
                 Box::new(ElfHeader::<Elf64Addr, Elf64Off>::new())
@@ -149,7 +91,7 @@ impl Elfio {
     }
 
     /// Returns a reference for an endianess converter used for the current file
-    pub fn get_converter(&self) -> &utils::Converter {
+    pub fn get_converter(&self) -> &Converter {
         &self.converter
     }
 

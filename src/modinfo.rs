@@ -20,9 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use super::*;
 use std::collections::hash_map::Iter;
 use std::collections::HashMap;
+
+use super::elfio::*;
+use super::section::*;
+use super::types::*;
 
 // --------------------------------------------------------------------------
 /// A section data accessor intended to modinfo tables. The accessor is useful

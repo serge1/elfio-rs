@@ -20,7 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-use super::*;
+use super::elfio::*;
+use super::section::*;
+use super::types::*;
 
 /// A section data accessor intended to string tables
 ///

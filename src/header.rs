@@ -22,9 +22,11 @@ THE SOFTWARE.
 
 extern crate num_traits;
 
-use super::utils::*;
-use super::*;
 use num_traits::*;
+use std::io;
+
+use super::types::*;
+use super::utils::*;
 
 // --------------------------------------------------------------------------
 pub trait ElfHeaderAccessTrait {
